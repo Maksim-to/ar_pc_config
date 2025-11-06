@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-    <title>AR Визуализация архитектуры ПК - Улучшенная версия</title>
+    <title>AR Визуализация архитектуры ПК</title>
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
     <style>
@@ -19,13 +19,13 @@
             position: absolute;
             top: 10px;
             left: 10px;
-            background: rgba(0,0,0,0.8);
+            background: rgba(0,0,0,0.9);
             color: white;
             padding: 15px;
             border-radius: 10px;
             z-index: 1000;
             max-width: 300px;
-            backdrop-filter: blur(10px);
+            border: 2px solid #00ff00;
         }
         
         .loading {
@@ -34,22 +34,44 @@
             left: 50%;
             transform: translate(-50%, -50%);
             color: white;
-            font-size: 18px;
+            font-size: 20px;
+            background: rgba(0,0,0,0.8);
+            padding: 20px;
+            border-radius: 10px;
             z-index: 1000;
+        }
+        
+        .marker-image {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            max-width: 150px;
+            z-index: 1000;
+        }
+        
+        .marker-image img {
+            max-width: 100%;
+            height: auto;
         }
     </style>
 </head>
 <body>
-    <!-- Индикатор загрузки -->
-    <div class="loading" id="loading">Загрузка AR... Разрешите доступ к камере</div>
+    <div class="loading" id="loading">🔄 Загрузка AR... Разрешите доступ к камере</div>
     
-    <!-- Инструкция -->
     <div class="instruction">
         <h3>🔧 AR Архитектура ПК</h3>
-        <p>• Наведите камеру на Hiro-маркер</p>
-        <p>• Держите устройство steadily</p>
-        <p>• Хорошее освещение = лучшее качество</p>
-        <button onclick="toggleInstructions()">Скрыть</button>
+        <p>• Наведите камеру на маркер справа внизу</p>
+        <p>• Хорошее освещение</p>
+        <p>• Стабильное положение устройства</p>
+        <div id="markerStatus" style="color: #ff4444;">❌ Маркер не найден</div>
+    </div>
+
+    <div class="marker-image">
+        <p><strong>Используйте этот маркер:</strong></p>
+        <img src="pc-marker.png" alt="AR Marker" id="markerPreview">
     </div>
 
     <a-scene 
@@ -60,197 +82,208 @@
             detectionMode: mono_and_matrix;
             matrixCodeType: 3x3;
             maxDetectionRate: 60;
-            cameraParametersUrl: https://raw.githack.com/AR-js-org/AR.js/master/aframe/examples/image-tracking/nft/camera_para.dat;
         "
-        renderer="colorManagement: true; physicallyCorrectLights: true;"
+        renderer="colorManagement: true;"
         vr-mode-ui="enabled: false"
         loading-screen="enabled: false">
         
-        <!-- Улучшенный маркер с лучшими настройками -->
+        <!-- Собственный маркер -->
         <a-marker 
             type="pattern" 
-            url="https://raw.githack.com/AR-js-org/AR.js/master/aframe/examples/image-tracking/nft/pattern-hibo.patt"
+            url="pc-marker.patt"
             smooth="true"
-            smoothCount="10"
+            smoothCount="5"
             smoothTolerance="0.01"
             emitevents="true"
-            size="0.16">
+            size="0.16"
+            id="customMarker">
             
-            <!-- Основная сцена -->
-            <a-entity position="0 0 0" scale="0.8 0.8 0.8">
+            <!-- 3D модель внутренней структуры ПК -->
+            <a-entity position="0 0.5 0" scale="0.8 0.8 0.8">
                 
                 <!-- Полупрозрачный корпус -->
                 <a-box 
                     position="0 0.4 0" 
-                    width="1.5" 
-                    height="2.2" 
-                    depth="0.5" 
+                    width="1.8" 
+                    height="2.5" 
+                    depth="0.6" 
                     color="#1a1a1a" 
-                    material="transparent: true; opacity: 0.2; side: double">
+                    material="transparent: true; opacity: 0.1; side: double">
                 </a-box>
                 
-                <!-- Материнская плата (зеленая плата) -->
+                <!-- Материнская плата -->
                 <a-box 
-                    position="0 0.8 0.2" 
-                    width="1.0" 
-                    height="0.7" 
-                    depth="0.02" 
+                    position="0 0.9 0.25" 
+                    width="1.2" 
+                    height="0.9" 
+                    depth="0.03" 
                     color="#2d5c2d"
-                    material="shader: flat">
+                    material="shader: standard">
                     <a-text 
                         value="Материнская плата" 
-                        position="0 0.5 0.03" 
+                        position="0 0.6 0.04" 
                         align="center" 
                         color="#00ff00" 
                         scale="1.5 1.5 1.5">
                     </a-text>
                 </a-box>
                 
-                <!-- Процессор (центральный) -->
+                <!-- Процессор -->
                 <a-box 
-                    position="0 0.9 0.22" 
-                    width="0.2" 
-                    height="0.2" 
+                    position="0 1.0 0.28" 
+                    width="0.25" 
+                    height="0.25" 
                     depth="0.05" 
                     color="#ff4444"
-                    material="shader: standard; metalness: 0.3; roughness: 0.2">
+                    material="shader: standard; metalness: 0.5">
                     <a-text 
                         value="CPU" 
-                        position="0 0.15 0.03" 
+                        position="0 0.18 0.03" 
                         align="center" 
                         color="white" 
                         scale="0.8 0.8 0.8">
                     </a-text>
                 </a-box>
                 
-                <!-- Слоты оперативной памяти -->
+                <!-- Оперативная память -->
                 <a-box 
-                    position="-0.3 0.85 0.22" 
-                    width="0.15" 
-                    height="0.4" 
+                    position="-0.35 0.95 0.28" 
+                    width="0.18" 
+                    height="0.5" 
                     depth="0.04" 
                     color="#00aa00"
                     material="shader: standard">
                     <a-text 
-                        value="RAM" 
-                        position="0 0.3 0.03" 
+                        value="RAM 1" 
+                        position="0 0.35 0.03" 
                         align="center" 
                         color="white" 
-                        scale="0.6 0.6 0.6">
+                        scale="0.5 0.5 0.5">
                     </a-text>
                 </a-box>
                 
                 <a-box 
-                    position="-0.1 0.85 0.22" 
-                    width="0.15" 
-                    height="0.4" 
+                    position="-0.15 0.95 0.28" 
+                    width="0.18" 
+                    height="0.5" 
                     depth="0.04" 
                     color="#00aa00"
                     material="shader: standard">
+                    <a-text 
+                        value="RAM 2" 
+                        position="0 0.35 0.03" 
+                        align="center" 
+                        color="white" 
+                        scale="0.5 0.5 0.5">
+                    </a-text>
                 </a-box>
                 
                 <!-- Видеокарта -->
                 <a-box 
-                    position="0.25 0.7 0.22" 
-                    width="0.25" 
-                    height="0.15" 
+                    position="0.3 0.75 0.28" 
+                    width="0.3" 
+                    height="0.2" 
                     depth="0.04" 
                     color="#aa00aa"
                     material="shader: standard">
                     <a-text 
                         value="GPU" 
-                        position="0 0.1 0.03" 
+                        position="0 0.15 0.03" 
                         align="center" 
                         color="white" 
-                        scale="0.6 0.6 0.6">
-                    </a-text>
-                </a-box>
-                
-                <!-- Жесткий диск/SSD -->
-                <a-box 
-                    position="-0.4 0.4 0.2" 
-                    width="0.12" 
-                    height="0.25" 
-                    depth="0.1" 
-                    color="#ffaa00"
-                    material="shader: standard">
-                    <a-text 
-                        value="SSD" 
-                        position="0 0.2 0.06" 
-                        align="center" 
-                        color="black" 
-                        scale="0.5 0.5 0.5">
+                        scale="0.7 0.7 0.7">
                     </a-text>
                 </a-box>
                 
                 <!-- Блок питания -->
                 <a-box 
-                    position="0.45 0.2 0.15" 
-                    width="0.25" 
-                    height="0.35" 
-                    depth="0.2" 
+                    position="0.5 0.3 0.2" 
+                    width="0.3" 
+                    height="0.4" 
+                    depth="0.25" 
                     color="#666666"
                     material="shader: standard">
                     <a-text 
-                        value="PSU" 
-                        position="0 0.25 0.11" 
+                        value="БП" 
+                        position="0 0.3 0.13" 
                         align="center" 
                         color="white" 
+                        scale="0.7 0.7 0.7">
+                    </a-text>
+                </a-box>
+                
+                <!-- SSD накопитель -->
+                <a-box 
+                    position="-0.45 0.5 0.25" 
+                    width="0.15" 
+                    height="0.3" 
+                    depth="0.12" 
+                    color="#ffaa00"
+                    material="shader: standard">
+                    <a-text 
+                        value="SSD" 
+                        position="0 0.25 0.07" 
+                        align="center" 
+                        color="black" 
                         scale="0.6 0.6 0.6">
                     </a-text>
                 </a-box>
                 
-                <!-- Кабели питания (декоративные линии) -->
-                <a-entity 
-                    line="start: 0.35 0.35 0.15; end: 0.2 0.6 0.21; color: #ffff00"
-                    material="linewidth: 5">
-                </a-entity>
-                <a-entity 
-                    line="start: 0.35 0.35 0.15; end: -0.25 0.5 0.21; color: #ffff00"
-                    material="linewidth: 5">
-                </a-entity>
+                <!-- Жесткий диск -->
+                <a-box 
+                    position="-0.45 0.1 0.25" 
+                    width="0.2" 
+                    height="0.3" 
+                    depth="0.15" 
+                    color="#ff6600"
+                    material="shader: standard">
+                    <a-text 
+                        value="HDD" 
+                        position="0 0.25 0.08" 
+                        align="center" 
+                        color="black" 
+                        scale="0.6 0.6 0.6">
+                    </a-text>
+                </a-box>
                 
-                <!-- Освещение для лучшей видимости -->
+                <!-- Освещение -->
                 <a-light type="ambient" color="#ffffff" intensity="0.6"></a-light>
-                <a-light type="directional" position="1 1 1" intensity="0.8" color="#ffffff"></a-light>
+                <a-light type="directional" position="2 5 3" intensity="0.8" color="#ffffff"></a-light>
                 
             </a-entity>
             
         </a-marker>
         
-        <!-- Статическая камера (не следует за маркером) -->
-        <a-entity camera="fov: 60; near: 0.01; far: 100" position="0 0 0"></a-entity>
+        <a-entity camera></a-entity>
         
     </a-scene>
 
     <script>
-        // Скрываем инструкции по клику
-        function toggleInstructions() {
-            const instructions = document.querySelector('.instruction');
-            instructions.style.display = instructions.style.display === 'none' ? 'block' : 'none';
-        }
-        
-        // Скрываем индикатор загрузки когда сцена загружена
+        // Скрываем индикатор загрузки
         document.querySelector('a-scene').addEventListener('loaded', function() {
             document.getElementById('loading').style.display = 'none';
+            console.log('AR сцена загружена');
         });
+
+        // Отслеживание маркера
+        const marker = document.getElementById('customMarker');
+        const statusDiv = document.getElementById('markerStatus');
         
-        // Обработка ошибок
-        document.querySelector('a-scene').addEventListener('arjs-error', function(ev) {
-            console.error('AR.js Error:', ev.detail);
-            alert('Ошибка AR: ' + ev.detail);
-        });
-        
-        // Улучшенное отслеживание маркера
-        const marker = document.querySelector('a-marker');
         marker.addEventListener('markerFound', () => {
-            console.log('Маркер найден!');
-            document.querySelector('.instruction').style.background = 'rgba(0, 150, 0, 0.8)';
+            console.log('✅ Маркер распознан!');
+            statusDiv.innerHTML = '✅ Маркер распознан!';
+            statusDiv.style.color = '#00ff00';
         });
         
         marker.addEventListener('markerLost', () => {
-            console.log('Маркер потерян!');
-            document.querySelector('.instruction').style.background = 'rgba(0, 0, 0, 0.8)';
+            console.log('❌ Маркер потерян');
+            statusDiv.innerHTML = '❌ Наведите на маркер';
+            statusDiv.style.color = '#ff4444';
+        });
+
+        // Обработка ошибок
+        window.addEventListener('arjs-nft-loaded', function(ev) {
+            console.log('Маркер загружен:', ev.detail);
         });
     </script>
 </body>
