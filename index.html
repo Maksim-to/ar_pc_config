@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-    <title>AR Архитектура ПК - OBJ модели</title>
+    <title>AR Архитектура ПК - Все файлы в одной папке</title>
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
     <style>
@@ -99,18 +99,6 @@
             width: 0%;
             transition: width 0.3s;
         }
-        
-        .fps-counter {
-            position: absolute;
-            top: 10px;
-            right: 180px;
-            background: rgba(0,0,0,0.7);
-            color: #00ff00;
-            padding: 5px 10px;
-            border-radius: 5px;
-            font-size: 12px;
-            font-family: monospace;
-        }
     </style>
 </head>
 <body>
@@ -119,7 +107,7 @@
         <div class="progress-bar">
             <div class="progress-fill" id="progressFill"></div>
         </div>
-        <div style="font-size: 14px; margin-top: 10px;" id="loadStatus">Инициализация OBJ моделей...</div>
+        <div style="font-size: 14px; margin-top: 10px;" id="loadStatus">Инициализация 3D моделей...</div>
     </div>
     
     <div class="instruction">
@@ -129,8 +117,6 @@
         <p>• Используйте жесты для масштабирования</p>
         <div id="markerStatus" style="color: #ff4444; margin-top: 10px;">❌ Ожидание маркера...</div>
     </div>
-
-    <div class="fps-counter" id="fpsCounter">FPS: --</div>
 
     <div class="component-info" id="componentInfo">
         <h3 id="infoTitle" style="margin: 0 0 15px 0; color: #00ff00;">Компонент</h3>
@@ -153,8 +139,7 @@
         "
         renderer="colorManagement: true; antialias: true;"
         vr-mode-ui="enabled: false"
-        loading-screen="enabled: false"
-        stats>
+        loading-screen="enabled: false">
         
         <!-- Собственный маркер -->
         <a-marker 
@@ -167,12 +152,12 @@
             size="0.16"
             id="customMarker">
             
-            <!-- Сцена с OBJ моделями -->
+            <!-- Сцена с OBJ моделями (все файлы в корне) -->
             <a-entity position="0 0.3 0" scale="0.7 0.7 0.7" rotation="0 0 0">
                 
                 <!-- Материнская плата -->
                 <a-entity 
-                    obj-model="obj: models/motherboard.obj; mtl: models/motherboard.mtl"
+                    obj-model="obj: motherboard.obj; mtl: motherboard.mtl"
                     position="0 0.8 0.1"
                     scale="0.5 0.5 0.5"
                     rotation="-90 0 0"
@@ -184,7 +169,7 @@
                 
                 <!-- Процессор -->
                 <a-entity 
-                    obj-model="obj: models/cpu.obj; mtl: models/cpu.mtl"
+                    obj-model="obj: cpu.obj; mtl: cpu.mtl"
                     position="0 0.95 0.15"
                     scale="0.1 0.1 0.1"
                     rotation="0 0 0"
@@ -196,7 +181,7 @@
                 
                 <!-- Оперативная память -->
                 <a-entity 
-                    obj-model="obj: models/ram.obj; mtl: models/ram.mtl"
+                    obj-model="obj: ram.obj; mtl: ram.mtl"
                     position="-0.15 0.9 0.12"
                     scale="0.2 0.2 0.2"
                     rotation="0 0 0"
@@ -208,7 +193,7 @@
                 
                 <!-- Видеокарта -->
                 <a-entity 
-                    obj-model="obj: models/gpu.obj; mtl: models/gpu.mtl"
+                    obj-model="obj: gpu.obj; mtl: gpu.mtl"
                     position="0.25 0.65 0.1"
                     scale="0.35 0.35 0.35"
                     rotation="0 0 0"
@@ -220,7 +205,7 @@
                 
                 <!-- SSD накопитель -->
                 <a-entity 
-                    obj-model="obj: models/ssd.obj; mtl: models/ssd.mtl"
+                    obj-model="obj: ssd.obj; mtl: ssd.mtl"
                     position="-0.3 0.7 0.12"
                     scale="0.25 0.25 0.25"
                     rotation="0 0 0"
@@ -232,7 +217,7 @@
                 
                 <!-- Блок питания -->
                 <a-entity 
-                    obj-model="obj: models/psu.obj; mtl: models/psu.mtl"
+                    obj-model="obj: psu.obj; mtl: psu.mtl"
                     position="0.4 0.3 0.05"
                     scale="0.3 0.3 0.3"
                     rotation="0 90 0"
@@ -244,7 +229,7 @@
                 
                 <!-- Система охлаждения -->
                 <a-entity 
-                    obj-model="obj: models/cooler.obj; mtl: models/cooler.mtl"
+                    obj-model="obj: cooler.obj; mtl: cooler.mtl"
                     position="0 1.1 0.1"
                     scale="0.4 0.4 0.4"
                     rotation="0 0 0"
@@ -279,14 +264,14 @@
         // Отслеживание загрузки сцены
         document.querySelector('a-scene').addEventListener('loaded', function() {
             updateProgress('Сцена загружена', 20);
-            
-            // Запускаем отслеживание загрузки OBJ моделей
             startModelLoading();
         });
         
         function startModelLoading() {
             const models = document.querySelectorAll('[obj-model]');
-            models.forEach((model, index) => {
+            
+            models.forEach((model) => {
+                // Слушаем успешную загрузку
                 model.addEventListener('model-loaded', () => {
                     modelsLoaded++;
                     const progress = 20 + (modelsLoaded / totalModels) * 70;
@@ -305,7 +290,7 @@
                 // Обработка ошибок загрузки
                 model.addEventListener('model-error', (e) => {
                     console.error('Ошибка загрузки модели:', e.detail);
-                    updateProgress(`Ошибка загрузки модели ${index + 1}`, 0);
+                    updateProgress('Ошибка загрузки модели', 0);
                 });
             });
         }
@@ -314,22 +299,6 @@
             document.getElementById('loadStatus').textContent = text;
             document.getElementById('progressFill').style.width = percent + '%';
         }
-        
-        // FPS счетчик
-        let frameCount = 0;
-        let lastTime = performance.now();
-        function updateFPS() {
-            frameCount++;
-            const currentTime = performance.now();
-            if (currentTime >= lastTime + 1000) {
-                const fps = Math.round((frameCount * 1000) / (currentTime - lastTime));
-                document.getElementById('fpsCounter').textContent = `FPS: ${fps}`;
-                frameCount = 0;
-                lastTime = currentTime;
-            }
-            requestAnimationFrame(updateFPS);
-        }
-        updateFPS();
         
         // Отслеживание маркера
         const marker = document.getElementById('customMarker');
@@ -385,10 +354,11 @@
             document.getElementById('componentInfo').style.display = 'none';
         }
         
-        // Авто-скрытие инструкций
+        // Авто-скрытие инструкций через 15 секунд
         setTimeout(() => {
             const instruction = document.querySelector('.instruction');
             instruction.style.opacity = '0.6';
+            instruction.style.transition = 'opacity 2s';
         }, 15000);
     </script>
 </body>
