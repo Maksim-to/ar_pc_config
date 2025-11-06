@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-    <title>AR Архитектура ПК - Реалистичные модели</title>
+    <title>AR Архитектура ПК - OBJ модели</title>
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
     <style>
@@ -19,12 +19,12 @@
             position: absolute;
             top: 10px;
             left: 10px;
-            background: rgba(0,0,0,0.9);
+            background: rgba(0,0,0,0.95);
             color: white;
             padding: 15px;
             border-radius: 10px;
             z-index: 1000;
-            max-width: 320px;
+            max-width: 350px;
             border: 2px solid #00ff00;
         }
         
@@ -36,8 +36,8 @@
             color: white;
             font-size: 18px;
             background: rgba(0,0,0,0.9);
-            padding: 20px;
-            border-radius: 10px;
+            padding: 25px;
+            border-radius: 15px;
             z-index: 1000;
             text-align: center;
         }
@@ -47,53 +47,99 @@
             bottom: 10px;
             right: 10px;
             background: white;
-            padding: 10px;
-            border-radius: 5px;
-            max-width: 150px;
+            padding: 12px;
+            border-radius: 8px;
+            max-width: 160px;
             z-index: 1000;
         }
         
         .marker-image img {
             max-width: 100%;
             height: auto;
+            border: 2px solid #333;
         }
         
         .component-info {
             position: absolute;
-            top: 10px;
-            right: 10px;
-            background: rgba(0,0,0,0.9);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.95);
             color: white;
-            padding: 15px;
-            border-radius: 10px;
-            max-width: 300px;
+            padding: 25px;
+            border-radius: 15px;
+            max-width: 400px;
             display: none;
-            z-index: 1000;
+            z-index: 1001;
+            border: 3px solid #0066cc;
+        }
+        
+        .close-btn {
+            background: #ff4444;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: #333;
+            border-radius: 2px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: #00ff00;
+            width: 0%;
+            transition: width 0.3s;
+        }
+        
+        .fps-counter {
+            position: absolute;
+            top: 10px;
+            right: 180px;
+            background: rgba(0,0,0,0.7);
+            color: #00ff00;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            font-family: monospace;
         }
     </style>
 </head>
 <body>
     <div class="loading" id="loading">
         <div>🔄 Загрузка AR-сцены...</div>
-        <div style="font-size: 14px; margin-top: 10px;">Загрузка 3D моделей может занять несколько секунд</div>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <div style="font-size: 14px; margin-top: 10px;" id="loadStatus">Инициализация OBJ моделей...</div>
     </div>
     
     <div class="instruction">
         <h3>🔧 AR Архитектура ПК</h3>
-        <p>• Наведите камеру на маркер</p>
+        <p>• Наведите камеру на маркер справа</p>
         <p>• Касайтесь компонентов для информации</p>
         <p>• Используйте жесты для масштабирования</p>
-        <div id="markerStatus" style="color: #ff4444;">❌ Маркер не найден</div>
+        <div id="markerStatus" style="color: #ff4444; margin-top: 10px;">❌ Ожидание маркера...</div>
     </div>
 
+    <div class="fps-counter" id="fpsCounter">FPS: --</div>
+
     <div class="component-info" id="componentInfo">
-        <h4 id="infoTitle">Компонент</h4>
-        <p id="infoDescription">Описание компонента</p>
-        <button onclick="hideInfo()">Закрыть</button>
+        <h3 id="infoTitle" style="margin: 0 0 15px 0; color: #00ff00;">Компонент</h3>
+        <div id="infoDescription" style="line-height: 1.5;">Описание компонента</div>
+        <button class="close-btn" onclick="hideInfo()">✕ Закрыть</button>
     </div>
 
     <div class="marker-image">
-        <p><strong>AR Маркер:</strong></p>
+        <p style="margin: 0 0 8px 0; font-weight: bold;">📱 AR Маркер:</p>
         <img src="pc-marker.png" alt="AR Marker">
     </div>
 
@@ -107,7 +153,8 @@
         "
         renderer="colorManagement: true; antialias: true;"
         vr-mode-ui="enabled: false"
-        loading-screen="enabled: false">
+        loading-screen="enabled: false"
+        stats>
         
         <!-- Собственный маркер -->
         <a-marker 
@@ -120,127 +167,102 @@
             size="0.16"
             id="customMarker">
             
-            <!-- Сцена с реалистичными компонентами -->
-            <a-entity position="0 0.3 0" scale="0.015 0.015 0.015" rotation="0 0 0">
+            <!-- Сцена с OBJ моделями -->
+            <a-entity position="0 0.3 0" scale="0.7 0.7 0.7" rotation="0 0 0">
                 
-                <!-- Материнская плата (ASUS ROG) -->
+                <!-- Материнская плата -->
                 <a-entity 
-                    gltf-model="https://cdn.aframe.io/test-models/models/glTF-2.0/virtualcity/VC.gltf"
-                    position="0 40 0"
-                    scale="2 2 2"
+                    obj-model="obj: models/motherboard.obj; mtl: models/motherboard.mtl"
+                    position="0 0.8 0.1"
+                    scale="0.5 0.5 0.5"
                     rotation="-90 0 0"
                     class="clickable"
                     data-component="motherboard"
-                    data-title="Материнская плата ASUS ROG"
-                    data-description="Форм-фактор: ATX&#10;Сокет: LGA 1700&#10;Чипсет: Intel Z790&#10;Слоты: 4× DDR5, 3× PCIe x16">
+                    data-title="Материнская плата ASUS ROG Strix Z790-E"
+                    data-description="Форм-фактор: ATX&#10;Сокет: LGA 1700&#10;Чипсет: Intel Z790&#10;Слоты памяти: 4× DDR5&#10;Порты: 2× USB4, 8× USB 3.2&#10;Сеть: 2.5G Ethernet + Wi-Fi 6E">
                 </a-entity>
                 
-                <!-- Процессор (Intel Core i9) -->
+                <!-- Процессор -->
                 <a-entity 
-                    gltf-model="https://cdn.aframe.io/test-models/models/glTF-2.0/Box/glTF-Binary/Box.glb"
-                    position="0 45 5"
-                    scale="8 1 8"
+                    obj-model="obj: models/cpu.obj; mtl: models/cpu.mtl"
+                    position="0 0.95 0.15"
+                    scale="0.1 0.1 0.1"
                     rotation="0 0 0"
-                    material="color: #ff4444; metalness: 0.8; roughness: 0.2"
                     class="clickable"
                     data-component="cpu"
                     data-title="Процессор Intel Core i9-13900K"
-                    data-description="Ядра: 24 (8P+16E)&#10;Частота: 3.0-5.8 GHz&#10;Кэш: 36 MB&#10;TDP: 125W">
+                    data-description="Архитектура: Raptor Lake&#10;Ядра: 24 (8P+16E)&#10;Потоки: 32&#10;Частота: 3.0-5.8 GHz&#10;Кэш L3: 36 MB&#10;TDP: 125W (Turbo 253W)">
                 </a-entity>
                 
-                <!-- Оперативная память (Corsair) -->
+                <!-- Оперативная память -->
                 <a-entity 
-                    gltf-model="https://cdn.aframe.io/test-models/models/glTF-2.0/Box/glTF-Binary/Box.glb"
-                    position="-15 42 0"
-                    scale="2 8 1"
+                    obj-model="obj: models/ram.obj; mtl: models/ram.mtl"
+                    position="-0.15 0.9 0.12"
+                    scale="0.2 0.2 0.2"
                     rotation="0 0 0"
-                    material="color: #00aa00; metalness: 0.5"
                     class="clickable"
                     data-component="ram"
-                    data-title="Оперативная память Corsair Vengeance"
-                    data-description="Объём: 16 GB&#10;Тип: DDR5&#10;Частота: 5600 MHz&#10;Тайминги: CL36">
+                    data-title="Оперативная память Corsair Vengeance RGB DDR5"
+                    data-description="Объём: 32 GB (2×16 GB)&#10;Тип: DDR5&#10;Частота: 5600 MHz&#10;Тайминги: 36-36-36-76&#10;Напряжение: 1.25V&#10;Подсветка: RGB">
                 </a-entity>
                 
+                <!-- Видеокарта -->
                 <a-entity 
-                    gltf-model="https://cdn.aframe.io/test-models/models/glTF-2.0/Box/glTF-Binary/Box.glb"
-                    position="-5 42 0"
-                    scale="2 8 1"
+                    obj-model="obj: models/gpu.obj; mtl: models/gpu.mtl"
+                    position="0.25 0.65 0.1"
+                    scale="0.35 0.35 0.35"
                     rotation="0 0 0"
-                    material="color: #00aa00; metalness: 0.5"
-                    class="clickable"
-                    data-component="ram2"
-                    data-title="Оперативная память Corsair Vengeance"
-                    data-description="Объём: 16 GB&#10;Тип: DDR5&#10;Частота: 5600 MHz&#10;Тайминги: CL36">
-                </a-entity>
-                
-                <!-- Видеокарта (NVIDIA RTX) -->
-                <a-entity 
-                    gltf-model="https://cdn.aframe.io/test-models/models/glTF-2.0/Box/glTF-Binary/Box.glb"
-                    position="20 35 0"
-                    scale="4 12 2"
-                    rotation="0 0 0"
-                    material="color: #aa00aa; metalness: 0.7"
                     class="clickable"
                     data-component="gpu"
-                    data-title="Видеокарта NVIDIA RTX 4080"
-                    data-description="Память: 16 GB GDDR6X&#10;Шина: 256-bit&#10;Тактовая частота: 2205 MHz&#10;Порты: 3× DisplayPort, 1× HDMI">
+                    data-title="Видеокарта NVIDIA GeForce RTX 4080"
+                    data-description="Архитектура: Ada Lovelace&#10;Память: 16 GB GDDR6X&#10;Шина: 256-bit&#10;Тактовая частота: 2205 MHz&#10;Порты: 3× DisplayPort 1.4a, 1× HDMI 2.1&#10;Рекомендуемый БП: 750W">
                 </a-entity>
                 
-                <!-- SSD накопитель (Samsung) -->
+                <!-- SSD накопитель -->
                 <a-entity 
-                    gltf-model="https://cdn.aframe.io/test-models/models/glTF-2.0/Box/glTF-Binary/Box.glb"
-                    position="-25 30 0"
-                    scale="6 1 4"
+                    obj-model="obj: models/ssd.obj; mtl: models/ssd.mtl"
+                    position="-0.3 0.7 0.12"
+                    scale="0.25 0.25 0.25"
                     rotation="0 0 0"
-                    material="color: #ffaa00; metalness: 0.3"
                     class="clickable"
                     data-component="ssd"
-                    data-title="SSD Samsung 980 Pro"
-                    data-description="Объём: 1 TB&#10;Интерфейс: NVMe PCIe 4.0&#10;Скорость чтения: 7000 MB/s&#10;Скорость записи: 5000 MB/s">
+                    data-title="SSD накопитель Samsung 980 Pro NVMe"
+                    data-description="Объём: 2 TB&#10;Интерфейс: NVMe PCIe 4.0&#10;Скорость чтения: 7000 MB/s&#10;Скорость записи: 5000 MB/s&#10;Форм-фактор: M.2 2280&#10;Ресурс записи: 1200 TBW">
                 </a-entity>
                 
-                <!-- Блок питания (Corsair) -->
+                <!-- Блок питания -->
                 <a-entity 
-                    gltf-model="https://cdn.aframe.io/test-models/models/glTF-2.0/Box/glTF-Binary/Box.glb"
-                    position="25 15 0"
-                    scale="10 8 6"
-                    rotation="0 0 0"
-                    material="color: #666666; metalness: 0.4"
+                    obj-model="obj: models/psu.obj; mtl: models/psu.mtl"
+                    position="0.4 0.3 0.05"
+                    scale="0.3 0.3 0.3"
+                    rotation="0 90 0"
                     class="clickable"
                     data-component="psu"
                     data-title="Блок питания Corsair RM850x"
-                    data-description="Мощность: 850W&#10;Сертификат: 80+ Gold&#10;Разъёмы: 1× 24-pin, 2× 8-pin CPU, 6× 8-pin PCIe&#10;Вентилятор: 135mm">
+                    data-description="Мощность: 850W&#10;Сертификат: 80+ Gold&#10;КПД: до 90%&#10;Разъёмы: 1× 24-pin, 2× 8-pin CPU, 6× 8-pin PCIe&#10;Вентилятор: 135mm гидродинамический&#10;Гарантия: 10 лет">
                 </a-entity>
                 
-                <!-- Система охлаждения (Liquid Cooler) -->
+                <!-- Система охлаждения -->
                 <a-entity 
-                    gltf-model="https://cdn.aframe.io/test-models/models/glTF-2.0/Box/glTF-Binary/Box.glb"
-                    position="0 50 0"
-                    scale="12 2 12"
+                    obj-model="obj: models/cooler.obj; mtl: models/cooler.mtl"
+                    position="0 1.1 0.1"
+                    scale="0.4 0.4 0.4"
                     rotation="0 0 0"
-                    material="color: #0066cc; metalness: 0.6"
                     class="clickable"
                     data-component="cooler"
-                    data-title="СЖО NZXT Kraken"
-                    data-description="Тип: жидкостное охлаждение&#10;Радиатор: 360mm&#10;Вентиляторы: 3× 120mm&#10;Подсветка: RGB">
+                    data-title="СЖО NZXT Kraken X73"
+                    data-description="Тип: жидкостное охлаждение&#10;Радиатор: 360mm&#10;Вентиляторы: 3× Aer P 120mm&#10;Совместимость: Intel LGA 1700, AMD AM5&#10;Подсветка: RGB Infinity Mirror">
                 </a-entity>
                 
-                <!-- Кабельная система -->
-                <a-entity 
-                    position="0 0 0"
-                    class="cable-system">
-                    <!-- Кабели питания -->
-                    <a-entity line="start: 25 19 0; end: 15 40 0; color: #ffff00" material="linewidth: 3"></a-entity>
-                    <a-entity line="start: 25 19 0; end: -20 32 0; color: #ffff00" material="linewidth: 3"></a-entity>
-                    <a-entity line="start: 25 19 0; end: 0 47 0; color: #ffff00" material="linewidth: 3"></a-entity>
-                    <!-- SATA кабели -->
-                    <a-entity line="start: -25 32 0; end: -15 40 0; color: #ff8800" material="linewidth: 2"></a-entity>
-                </a-entity>
+                <!-- Кабели питания -->
+                <a-entity line="start: 0.35 0.45 0.05; end: 0.15 0.75 0.1; color: #ffff00" material="linewidth: 4"></a-entity>
+                <a-entity line="start: 0.35 0.45 0.05; end: -0.25 0.72 0.12; color: #ffff00" material="linewidth: 4"></a-entity>
+                <a-entity line="start: 0.35 0.45 0.05; end: 0 1.05 0.1; color: #ffff00" material="linewidth: 4"></a-entity>
                 
                 <!-- Освещение -->
                 <a-light type="ambient" color="#ffffff" intensity="0.7"></a-light>
-                <a-light type="directional" position="50 100 50" intensity="0.9" color="#ffffff"></a-light>
-                <a-light type="point" position="0 60 30" intensity="0.5" color="#ffffff"></a-light>
+                <a-light type="directional" position="2 5 3" intensity="0.9" color="#ffffff"></a-light>
+                <a-light type="point" position="0 2 2" intensity="0.5" color="#ffffff"></a-light>
                 
             </a-entity>
             
@@ -251,74 +273,122 @@
     </a-scene>
 
     <script>
-        // Скрываем индикатор загрузки
+        let modelsLoaded = 0;
+        const totalModels = 6;
+        
+        // Отслеживание загрузки сцены
         document.querySelector('a-scene').addEventListener('loaded', function() {
-            setTimeout(() => {
-                document.getElementById('loading').style.display = 'none';
-                console.log('AR сцена загружена');
-            }, 2000);
+            updateProgress('Сцена загружена', 20);
+            
+            // Запускаем отслеживание загрузки OBJ моделей
+            startModelLoading();
         });
-
+        
+        function startModelLoading() {
+            const models = document.querySelectorAll('[obj-model]');
+            models.forEach((model, index) => {
+                model.addEventListener('model-loaded', () => {
+                    modelsLoaded++;
+                    const progress = 20 + (modelsLoaded / totalModels) * 70;
+                    updateProgress(`Модели: ${modelsLoaded}/${totalModels}`, progress);
+                    
+                    if (modelsLoaded === totalModels) {
+                        setTimeout(() => {
+                            updateProgress('Готово!', 100);
+                            setTimeout(() => {
+                                document.getElementById('loading').style.display = 'none';
+                            }, 800);
+                        }, 1000);
+                    }
+                });
+                
+                // Обработка ошибок загрузки
+                model.addEventListener('model-error', (e) => {
+                    console.error('Ошибка загрузки модели:', e.detail);
+                    updateProgress(`Ошибка загрузки модели ${index + 1}`, 0);
+                });
+            });
+        }
+        
+        function updateProgress(text, percent) {
+            document.getElementById('loadStatus').textContent = text;
+            document.getElementById('progressFill').style.width = percent + '%';
+        }
+        
+        // FPS счетчик
+        let frameCount = 0;
+        let lastTime = performance.now();
+        function updateFPS() {
+            frameCount++;
+            const currentTime = performance.now();
+            if (currentTime >= lastTime + 1000) {
+                const fps = Math.round((frameCount * 1000) / (currentTime - lastTime));
+                document.getElementById('fpsCounter').textContent = `FPS: ${fps}`;
+                frameCount = 0;
+                lastTime = currentTime;
+            }
+            requestAnimationFrame(updateFPS);
+        }
+        updateFPS();
+        
         // Отслеживание маркера
         const marker = document.getElementById('customMarker');
         const statusDiv = document.getElementById('markerStatus');
         
         marker.addEventListener('markerFound', () => {
-            console.log('✅ Маркер распознан!');
             statusDiv.innerHTML = '✅ Маркер распознан!';
             statusDiv.style.color = '#00ff00';
         });
         
         marker.addEventListener('markerLost', () => {
-            console.log('❌ Маркер потерян');
-            statusDiv.innerHTML = '❌ Наведите на маркер';
+            statusDiv.innerHTML = '❌ Ожидание маркера...';
             statusDiv.style.color = '#ff4444';
             hideInfo();
         });
-
+        
         // Обработка кликов по компонентам
         document.querySelector('a-scene').addEventListener('click', function(evt) {
             const clickedEl = evt.detail.intersection?.object.el;
             if (clickedEl && clickedEl.classList.contains('clickable')) {
-                showComponentInfo(
-                    clickedEl.getAttribute('data-title'),
-                    clickedEl.getAttribute('data-description')
-                );
+                const title = clickedEl.getAttribute('data-title');
+                const description = clickedEl.getAttribute('data-description');
+                showComponentInfo(title, description);
                 
                 // Анимация выделения
+                const originalScale = clickedEl.getAttribute('scale');
                 clickedEl.setAttribute('animation', {
                     property: 'scale',
-                    to: '1.2 1.2 1.2',
-                    dur: 200,
+                    to: `${originalScale.x * 1.15} ${originalScale.y * 1.15} ${originalScale.z * 1.15}`,
+                    dur: 400,
                     easing: 'easeOutElastic'
                 });
                 
                 setTimeout(() => {
                     clickedEl.setAttribute('animation', {
                         property: 'scale', 
-                        to: '1 1 1',
-                        dur: 300,
+                        to: `${originalScale.x} ${originalScale.y} ${originalScale.z}`,
+                        dur: 600,
                         easing: 'easeOutElastic'
                     });
                 }, 2000);
             }
         });
-
+        
         function showComponentInfo(title, description) {
             const infoDiv = document.getElementById('componentInfo');
             document.getElementById('infoTitle').textContent = title;
             document.getElementById('infoDescription').innerHTML = description.replace(/&#10;/g, '<br>');
             infoDiv.style.display = 'block';
         }
-
+        
         function hideInfo() {
             document.getElementById('componentInfo').style.display = 'none';
         }
-
+        
         // Авто-скрытие инструкций
         setTimeout(() => {
             const instruction = document.querySelector('.instruction');
-            instruction.style.opacity = '0.8';
+            instruction.style.opacity = '0.6';
         }, 15000);
     </script>
 </body>
