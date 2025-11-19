@@ -153,12 +153,12 @@
             size="0.16"
             id="networkMarker">
             
-            <!-- Сетевая топология Router-on-a-Stick -->
-            <a-entity position="0 0.3 0" scale="0.6 0.6 0.6" rotation="0 0 0">
+            <!-- Сетевая топология Router-on-a-Stick (ориентирована вверх) -->
+            <a-entity position="0 0 0" scale="0.6 0.6 0.6" rotation="0 0 0">
                 
-                <!-- Уровень 1: Компьютеры -->
+                <!-- Уровень 1: Компьютеры (внизу) -->
                 <!-- ПК1 (VLAN 10) -->
-                <a-entity id="pc1" position="-0.6 0.1 0">
+                <a-entity id="pc1" position="-0.4 -0.3 0">
                     <a-entity 
                         geometry="primitive: box; width: 0.12; height: 0.08; depth: 0.04"
                         material="color: #0099ff; shader: standard"
@@ -173,7 +173,7 @@
                 </a-entity>
                 
                 <!-- ПК2 (VLAN 20) -->
-                <a-entity id="pc2" position="0.6 0.1 0">
+                <a-entity id="pc2" position="0.4 -0.3 0">
                     <a-entity 
                         geometry="primitive: box; width: 0.12; height: 0.08; depth: 0.04"
                         material="color: #ff4444; shader: standard"
@@ -187,8 +187,8 @@
                     </a-entity>
                 </a-entity>
                 
-                <!-- Уровень 2: Коммутатор -->
-                <a-entity id="switch" position="0 0.3 0">
+                <!-- Уровень 2: Коммутатор (посередине) -->
+                <a-entity id="switch" position="0 0 0">
                     <a-entity 
                         geometry="primitive: box; width: 0.25; height: 0.15; depth: 0.1"
                         material="color: #666; shader: standard; metalness: 0.3"
@@ -202,13 +202,13 @@
                     </a-entity>
                     
                     <!-- Порты коммутатора -->
-                    <a-entity geometry="primitive: sphere; radius: 0.02; material: color: #00ff88" position="-0.1 0.08 0.06"></a-entity>
+                    <a-entity geometry="primitive: sphere; radius: 0.02; material: color: #00ff88" position="-0.08 0.08 0.06"></a-entity>
                     <a-entity geometry="primitive: sphere; radius: 0.02; material: color: #00ff88" position="0 0.08 0.06"></a-entity>
-                    <a-entity geometry="primitive: sphere; radius: 0.02; material: color: #ffaa00" position="0.1 0.08 0.06"></a-entity>
+                    <a-entity geometry="primitive: sphere; radius: 0.02; material: color: #ffaa00" position="0.08 0.08 0.06"></a-entity>
                 </a-entity>
                 
-                <!-- Уровень 3: Роутер -->
-                <a-entity id="router" position="0 0.6 0">
+                <!-- Уровень 3: Роутер (вверху) -->
+                <a-entity id="router" position="0 0.3 0">
                     <a-entity 
                         geometry="primitive: cylinder; radius: 0.12; height: 0.1"
                         material="color: #ffaa00; shader: standard; metalness: 0.5"
@@ -226,23 +226,23 @@
                     <a-entity geometry="primitive: box; width: 0.08; height: 0.03; depth: 0.02; material: color: #ff4444" position="0.05 0.07 0.06"></a-entity>
                 </a-entity>
                 
-                <!-- Сетевые соединения -->
+                <!-- Сетевые соединения (вертикальные) -->
                 <!-- ПК1 -> Коммутатор (VLAN 10) -->
-                <a-entity line="start: -0.6 0.14 0; end: -0.125 0.225 0; color: #0099ff" id="linePc1Switch"></a-entity>
+                <a-entity line="start: -0.4 -0.22 0; end: -0.15 -0.075 0; color: #0099ff" id="linePc1Switch"></a-entity>
                 
                 <!-- ПК2 -> Коммутатор (VLAN 20) -->
-                <a-entity line="start: 0.6 0.14 0; end: 0.125 0.225 0; color: #ff4444" id="linePc2Switch"></a-entity>
+                <a-entity line="start: 0.4 -0.22 0; end: 0.15 -0.075 0; color: #ff4444" id="linePc2Switch"></a-entity>
                 
                 <!-- Коммутатор -> Роутер (Trunk) -->
-                <a-entity line="start: 0 0.375 0; end: 0 0.525 0; color: #00ff88" id="lineSwitchRouter"></a-entity>
+                <a-entity line="start: 0 0.075 0; end: 0 0.225 0; color: #00ff88" id="lineSwitchRouter"></a-entity>
                 
                 <!-- Анимированные пакеты -->
                 <a-entity id="packetContainer">
                     <!-- Пакеты будут создаваться динамически -->
                 </a-entity>
                 
-                <!-- Легенда VLAN -->
-                <a-entity position="0 0.8 0">
+                <!-- Легенда VLAN (сверху) -->
+                <a-entity position="0 0.45 0">
                     <a-entity 
                         text="value: VLAN 10: 192.168.10.0/24; color: #0099ff; align: center; width: 3"
                         position="-0.5 0 0"
@@ -272,7 +272,7 @@
         let isTransmissionActive = false;
         let currentPacket = null;
         let packetSequence = 0;
-        let currentDirection = 'vlan10_to_vlan20'; // или 'vlan20_to_vlan10'
+        let currentDirection = 'vlan10_to_vlan20';
         
         // Симуляция загрузки
         let loadProgress = 0;
@@ -345,8 +345,8 @@
             // Определяем цвета и позиции в зависимости от направления
             const sourceColor = isVlan10to20 ? '#0099ff' : '#ff4444';
             const destColor = isVlan10to20 ? '#ff4444' : '#0099ff';
-            const startPos = isVlan10to20 ? '-0.6 0.14 0' : '0.6 0.14 0';
-            const endPos = isVlan10to20 ? '0.6 0.14 0' : '-0.6 0.14 0';
+            const startPos = isVlan10to20 ? '-0.4 -0.22 0' : '0.4 -0.22 0';
+            const endPos = isVlan10to20 ? '0.4 -0.22 0' : '-0.4 -0.22 0';
             
             // Создание пакета
             const packet = document.createElement('a-entity');
@@ -355,11 +355,14 @@
             packet.setAttribute('material', `color: ${sourceColor}; shader: standard`);
             packet.setAttribute('position', startPos);
             
-            // Этап 1: От ПК к коммутатору
+            // Этап 1: От ПК к коммутатору (вверх)
+            const switchY = isVlan10to20 ? -0.075 : -0.075;
+            const switchX = isVlan10to20 ? -0.15 : 0.15;
+            
             packet.setAttribute('animation', {
                 property: 'position',
                 from: startPos,
-                to: isVlan10to20 ? '-0.125 0.225 0' : '0.125 0.225 0',
+                to: `${switchX} ${switchY} 0`,
                 dur: 1500,
                 startEvents: 'start'
             });
@@ -373,13 +376,13 @@
                 `Пакет #${packetSequence}<br>VLAN: ${isVlan10to20 ? '10' : '20'}<br>От: ${isVlan10to20 ? '192.168.10.10' : '192.168.20.20'}<br>К: ${isVlan10to20 ? '192.168.20.20' : '192.168.10.10'}`
             );
             
-            // Этап 2: Коммутатор -> Роутер (Trunk)
+            // Этап 2: Коммутатор -> Роутер (Trunk, вверх)
             setTimeout(() => {
                 if (!isTransmissionActive) return;
                 packet.setAttribute('animation', {
                     property: 'position',
-                    from: isVlan10to20 ? '-0.125 0.225 0' : '0.125 0.225 0',
-                    to: '0 0.45 0',
+                    from: `${switchX} ${switchY} 0`,
+                    to: '0 0.15 0',
                     dur: 1500
                 });
                 updateVlanInfo(
@@ -394,8 +397,8 @@
                 packet.setAttribute('material', 'color: #00ff88');
                 packet.setAttribute('animation', {
                     property: 'position',
-                    from: '0 0.45 0',
-                    to: '0 0.525 0',
+                    from: '0 0.15 0',
+                    to: '0 0.225 0',
                     dur: 1000
                 });
                 updateVlanInfo(
@@ -404,14 +407,14 @@
                 );
             }, 3000);
             
-            // Этап 4: Роутер -> Коммутатор
+            // Этап 4: Роутер -> Коммутатор (вниз)
             setTimeout(() => {
                 if (!isTransmissionActive) return;
                 packet.setAttribute('material', `color: ${destColor}`);
                 packet.setAttribute('animation', {
                     property: 'position',
-                    from: '0 0.525 0',
-                    to: '0 0.45 0',
+                    from: '0 0.225 0',
+                    to: '0 0.15 0',
                     dur: 1000
                 });
                 updateVlanInfo(
@@ -420,23 +423,26 @@
                 );
             }, 4000);
             
-            // Этап 5: Коммутатор -> Получатель
+            // Этап 5: Коммутатор -> Получатель (вниз)
             setTimeout(() => {
                 if (!isTransmissionActive) return;
+                const destSwitchX = isVlan10to20 ? 0.15 : -0.15;
+                const destSwitchY = -0.075;
+                
                 packet.setAttribute('animation', {
                     property: 'position',
-                    from: '0 0.45 0',
-                    to: isVlan10to20 ? '0.125 0.225 0' : '-0.125 0.225 0',
+                    from: '0 0.15 0',
+                    to: `${destSwitchX} ${destSwitchY} 0`,
                     dur: 1500
                 });
             }, 5000);
             
-            // Этап 6: Доставка получателю
+            // Этап 6: Доставка получателю (горизонтально)
             setTimeout(() => {
                 if (!isTransmissionActive) return;
                 packet.setAttribute('animation', {
                     property: 'position',
-                    from: isVlan10to20 ? '0.125 0.225 0' : '-0.125 0.225 0',
+                    from: `${isVlan10to20 ? 0.15 : -0.15} -0.075 0`,
                     to: endPos,
                     dur: 1500
                 });
