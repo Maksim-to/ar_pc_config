@@ -197,11 +197,11 @@
                 
                 <!-- Уровень 1: Роутер (ближе к пользователю) -->
                 <a-entity id="router" position="0 0.1 -0.35">
-                    <!-- 3D модель роутера - уменьшенная до размеров ПК -->
+                    <!-- 3D модель роутера - УМЕНЬШЕНА В 10 РАЗ -->
                     <a-entity 
                         obj-model="obj: url(router.obj)"
                         position="0 0 0"
-                        scale="0.1 0.1 0.1"
+                        scale="0.01 0.01 0.01" <!-- Изменено с 0.1 на 0.01 -->
                         rotation="0 0 0"
                         material="color: #ffaa00; metalness: 0.3; roughness: 0.7"
                         class="clickable"
