@@ -140,7 +140,7 @@
         <div class="progress-bar">
             <div class="progress-fill" id="progressFill"></div>
         </div>
-        <div style="font-size: 14px; margin-top: 10px;" id="loadStatus">Инициализация 3D сцены...</div>
+        <div style="font-size: 14px; margin-top: 10px;" id="loadStatus">Инициализация 3D моделей...</div>
     </div>
     
     <button class="help-btn" onclick="toggleHelp()">?</button>
@@ -192,96 +192,104 @@
             size="0.16"
             id="networkMarker">
             
-            <!-- Сетевая топология Router-on-a-Stick (увеличенный масштаб) -->
+            <!-- Сетевая топология Router-on-a-Stick с 3D моделями -->
             <a-entity position="0 0 0" scale="0.8 0.8 0.8" rotation="0 0 0">
                 
                 <!-- Уровень 1: Роутер (ближе к пользователю) -->
                 <a-entity id="router" position="0 0.15 -0.35">
+                    <!-- 3D модель роутера -->
                     <a-entity 
-                        geometry="primitive: cylinder; radius: 0.12; height: 0.1"
-                        material="color: #ffaa00; shader: standard; metalness: 0.5"
+                        obj-model="obj: url(router.obj); mtl: url(router.mtl)"
+                        position="0 0 0"
+                        scale="0.15 0.15 0.15"
+                        rotation="0 0 0"
                         class="clickable"
                         data-info="Маршрутизатор&#10;Gi0/0.10: 192.168.10.1/24&#10;Gi0/0.20: 192.168.20.1/24&#10;Router-on-a-Stick конфигурация">
                     </a-entity>
                     <a-entity 
                         text="value: ROUTER; color: white; align: center; width: 1.0"
-                        position="0 -0.1 0.02"
+                        position="0 -0.2 0"
                         scale="0.25 0.25 0.25">
                     </a-entity>
                     
-                    <!-- Сабинтерфейсы -->
-                    <a-entity geometry="primitive: box; width: 0.08; height: 0.025; depth: 0.02; material: color: #0099ff" position="-0.04 0.06 0.06"></a-entity>
-                    <a-entity geometry="primitive: box; width: 0.08; height: 0.025; depth: 0.02; material: color: #ff4444" position="0.04 0.06 0.06"></a-entity>
-                    
                     <!-- Порты роутера -->
-                    <a-entity geometry="primitive: sphere; radius: 0.015; material: color: #00ff88" position="0 0.06 -0.06"></a-entity>
+                    <a-entity geometry="primitive: sphere; radius: 0.015; material: color: #00ff88" position="0 0.1 -0.08"></a-entity>
                 </a-entity>
                 
                 <!-- Уровень 2: Коммутатор (дальше от пользователя) -->
                 <a-entity id="switch" position="0 0.15 0.05">
+                    <!-- 3D модель коммутатора -->
                     <a-entity 
-                        geometry="primitive: box; width: 0.25; height: 0.15; depth: 0.1"
-                        material="color: #666; shader: standard; metalness: 0.3"
+                        obj-model="obj: url(switch.obj); mtl: url(switch.mtl)"
+                        position="0 0 0"
+                        scale="0.2 0.2 0.2"
+                        rotation="0 0 0"
                         class="clickable"
                         data-info="Коммутатор L2&#10;Port1: VLAN 10 (Access)&#10;Port2: VLAN 20 (Access)&#10;Port3: VLAN 10,20 (Trunk)">
                     </a-entity>
                     <a-entity 
                         text="value: SWITCH; color: white; align: center; width: 1.2"
-                        position="0 -0.12 0.055"
+                        position="0 -0.25 0"
                         scale="0.25 0.25 0.25">
                     </a-entity>
                     
                     <!-- Порты коммутатора -->
-                    <a-entity geometry="primitive: sphere; radius: 0.015; material: color: #0099ff" position="-0.1 0.06 0.055"></a-entity>
-                    <a-entity geometry="primitive: sphere; radius: 0.015; material: color: #ff4444" position="0.1 0.06 0.055"></a-entity>
-                    <a-entity geometry="primitive: sphere; radius: 0.015; material: color: #00ff88" position="0 0.06 -0.055"></a-entity>
+                    <a-entity geometry="primitive: sphere; radius: 0.015; material: color: #0099ff" position="-0.12 0.1 0.06"></a-entity>
+                    <a-entity geometry="primitive: sphere; radius: 0.015; material: color: #ff4444" position="0.12 0.1 0.06"></a-entity>
+                    <a-entity geometry="primitive: sphere; radius: 0.015; material: color: #00ff88" position="0 0.1 -0.06"></a-entity>
                 </a-entity>
                 
                 <!-- Уровень 3: Компьютеры (самые дальние от пользователя) -->
                 <!-- ПК1 (VLAN 10) -->
-                <a-entity id="pc1" position="-0.4 0.15 0.45">
+                <a-entity id="pc1" position="-0.4 0.1 0.45">
+                    <!-- 3D модель компьютера -->
                     <a-entity 
-                        geometry="primitive: box; width: 0.15; height: 0.08; depth: 0.04"
-                        material="color: #0099ff; shader: standard"
+                        obj-model="obj: url(computer.obj); mtl: url(computer.mtl)"
+                        position="0 0 0"
+                        scale="0.12 0.12 0.12"
+                        rotation="0 180 0"
                         class="clickable"
                         data-info="ПК1 - VLAN 10&#10;IP: 192.168.10.10/24&#10;MAC: AA:BB:CC:DD:EE:10&#10;Шлюз: 192.168.10.1">
                     </a-entity>
                     <a-entity 
                         text="value: ПК1; color: white; align: center; width: 0.8"
-                        position="0 -0.07 0.025"
+                        position="0 -0.15 0"
                         scale="0.18 0.18 0.18">
                     </a-entity>
                     <a-entity 
                         text="value: (VLAN10); color: #0099ff; align: center; width: 1.0"
-                        position="0 -0.12 0.025"
+                        position="0 -0.22 0"
                         scale="0.15 0.15 0.15">
                     </a-entity>
                     
                     <!-- Порты ПК1 -->
-                    <a-entity geometry="primitive: sphere; radius: 0.012; material: color: #0099ff" position="0 0.04 -0.025"></a-entity>
+                    <a-entity geometry="primitive: sphere; radius: 0.012; material: color: #0099ff" position="0 0.08 -0.05"></a-entity>
                 </a-entity>
                 
                 <!-- ПК2 (VLAN 20) -->
-                <a-entity id="pc2" position="0.4 0.15 0.45">
+                <a-entity id="pc2" position="0.4 0.1 0.45">
+                    <!-- 3D модель компьютера -->
                     <a-entity 
-                        geometry="primitive: box; width: 0.15; height: 0.08; depth: 0.04"
-                        material="color: #ff4444; shader: standard"
+                        obj-model="obj: url(computer.obj); mtl: url(computer.mtl)"
+                        position="0 0 0"
+                        scale="0.12 0.12 0.12"
+                        rotation="0 180 0"
                         class="clickable"
                         data-info="ПК2 - VLAN 20&#10;IP: 192.168.20.20/24&#10;MAC: AA:BB:CC:DD:EE:20&#10;Шлюз: 192.168.20.1">
                     </a-entity>
                     <a-entity 
                         text="value: ПК2; color: white; align: center; width: 0.8"
-                        position="0 -0.07 0.025"
+                        position="0 -0.15 0"
                         scale="0.18 0.18 0.18">
                     </a-entity>
                     <a-entity 
                         text="value: (VLAN20); color: #ff4444; align: center; width: 1.0"
-                        position="0 -0.12 0.025"
+                        position="0 -0.22 0"
                         scale="0.15 0.15 0.15">
                     </a-entity>
                     
                     <!-- Порты ПК2 -->
-                    <a-entity geometry="primitive: sphere; radius: 0.012; material: color: #ff4444" position="0 0.04 -0.025"></a-entity>
+                    <a-entity geometry="primitive: sphere; radius: 0.012; material: color: #ff4444" position="0 0.08 -0.05"></a-entity>
                 </a-entity>
                 
                 <!-- Сетевые соединения (правильно подключенные к портам) -->
@@ -289,10 +297,10 @@
                 <a-entity line="start: 0 0.15 -0.29; end: 0 0.15 -0.005; color: #00ff88; opacity: 0.8" id="lineRouterSwitch"></a-entity>
                 
                 <!-- Коммутатор -> ПК1 (VLAN 10) -->
-                <a-entity line="start: -0.1 0.15 0.005; end: -0.35 0.15 0.425; color: #0099ff; opacity: 0.8" id="lineSwitchPc1"></a-entity>
+                <a-entity line="start: -0.12 0.15 0.005; end: -0.35 0.15 0.425; color: #0099ff; opacity: 0.8" id="lineSwitchPc1"></a-entity>
                 
                 <!-- Коммутатор -> ПК2 (VLAN 20) -->
-                <a-entity line="start: 0.1 0.15 0.005; end: 0.35 0.15 0.425; color: #ff4444; opacity: 0.8" id="lineSwitchPc2"></a-entity>
+                <a-entity line="start: 0.12 0.15 0.005; end: 0.35 0.15 0.425; color: #ff4444; opacity: 0.8" id="lineSwitchPc2"></a-entity>
                 
                 <!-- Анимированные пакеты (точки вдоль кабелей) -->
                 <a-entity id="packetContainer">
@@ -333,20 +341,39 @@
         let currentPacket = null;
         let packetSequence = 0;
         let currentDirection = 'vlan10_to_vlan20';
+        let modelsLoaded = 0;
+        const totalModels = 4; // router, switch, computer (2 раза)
         
-        // Симуляция загрузки
+        // Отслеживание загрузки моделей
+        function onModelLoaded() {
+            modelsLoaded++;
+            const progress = 20 + (modelsLoaded / totalModels) * 70;
+            updateProgress(`Модели: ${modelsLoaded}/${totalModels}`, progress);
+            
+            if (modelsLoaded === totalModels) {
+                setTimeout(() => {
+                    updateProgress('Готово!', 100);
+                    setTimeout(() => {
+                        document.getElementById('loading').style.display = 'none';
+                    }, 800);
+                }, 1000);
+            }
+        }
+        
+        function updateProgress(text, percent) {
+            document.getElementById('loadStatus').textContent = text;
+            document.getElementById('progressFill').style.width = percent + '%';
+        }
+        
+        // Симуляция загрузки для демонстрации
         let loadProgress = 0;
         const loadInterval = setInterval(() => {
-            loadProgress += Math.random() * 15;
-            if (loadProgress >= 100) {
-                loadProgress = 100;
+            loadProgress += Math.random() * 10;
+            if (loadProgress >= 20) {
+                loadProgress = 20;
                 clearInterval(loadInterval);
-                setTimeout(() => {
-                    document.getElementById('loading').style.display = 'none';
-                }, 500);
             }
             document.getElementById('progressFill').style.width = loadProgress + '%';
-            document.getElementById('loadStatus').textContent = `Загрузка: ${Math.round(loadProgress)}%`;
         }, 200);
         
         // Отслеживание маркера
@@ -415,11 +442,11 @@
             packet.setAttribute('material', `color: ${sourceColor}; shader: standard; emissive: ${sourceColor}; emissiveIntensity: 0.5`);
             
             // Начальная позиция - от порта ПК
-            const startPos = isVlan10to20 ? '-0.4 0.15 0.425' : '0.4 0.15 0.425';
+            const startPos = isVlan10to20 ? '-0.35 0.15 0.425' : '0.35 0.15 0.425';
             packet.setAttribute('position', startPos);
             
             // Этап 1: От ПК к коммутатору (вдоль кабеля)
-            const switchPos = isVlan10to20 ? '-0.1 0.15 0.005' : '0.1 0.15 0.005';
+            const switchPos = isVlan10to20 ? '-0.12 0.15 0.005' : '0.12 0.15 0.005';
             
             packet.setAttribute('animation', {
                 property: 'position',
@@ -488,8 +515,8 @@
             // Этап 5: Коммутатор -> Получатель (вдоль кабеля)
             setTimeout(() => {
                 if (!isTransmissionActive) return;
-                const destSwitchPos = isVlan10to20 ? '0.1 0.15 0.005' : '-0.1 0.15 0.005';
-                const destPos = isVlan10to20 ? '0.4 0.15 0.425' : '-0.4 0.15 0.425';
+                const destSwitchPos = isVlan10to20 ? '0.12 0.15 0.005' : '-0.12 0.15 0.005';
+                const destPos = isVlan10to20 ? '0.35 0.15 0.425' : '-0.35 0.15 0.425';
                 
                 packet.setAttribute('animation', {
                     property: 'position',
@@ -562,6 +589,20 @@
                     alert('🔧 Сетевое устройство:\n\n' + alertText);
                 }
             }
+        });
+        
+        // Отслеживание загрузки моделей после загрузки сцены
+        document.querySelector('a-scene').addEventListener('loaded', function() {
+            const models = document.querySelectorAll('[obj-model]');
+            
+            models.forEach((model) => {
+                model.addEventListener('model-loaded', onModelLoaded);
+                model.addEventListener('model-error', (e) => {
+                    console.error('Ошибка загрузки модели:', e.detail);
+                    // Продолжаем даже при ошибках
+                    onModelLoaded();
+                });
+            });
         });
     </script>
 </body>
