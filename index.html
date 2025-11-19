@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-    <title>AR Визитка - СтанМашСтуд</title>
+    <title>AR Визуализация сетевых пакетов</title>
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
     <style>
@@ -25,7 +25,7 @@
             border-radius: 10px;
             z-index: 1000;
             max-width: 350px;
-            border: 2px solid #2E86AB;
+            border: 2px solid #00ff88;
         }
         
         .loading {
@@ -42,7 +42,7 @@
             text-align: center;
         }
         
-        .ar-buttons {
+        .controls {
             position: absolute;
             bottom: 20px;
             left: 50%;
@@ -52,8 +52,8 @@
             z-index: 1000;
         }
         
-        .ar-btn {
-            background: linear-gradient(45deg, #2E86AB, #A23B72);
+        .control-btn {
+            background: linear-gradient(45deg, #00ff88, #0099ff);
             color: white;
             border: none;
             padding: 12px 20px;
@@ -61,17 +61,13 @@
             cursor: pointer;
             font-size: 14px;
             font-weight: bold;
-            box-shadow: 0 4px 15px rgba(46, 134, 171, 0.3);
+            box-shadow: 0 4px 15px rgba(0, 255, 136, 0.3);
             transition: all 0.3s ease;
         }
         
-        .ar-btn:hover {
+        .control-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(46, 134, 171, 0.4);
-        }
-        
-        .ar-btn:active {
-            transform: translateY(0);
+            box-shadow: 0 6px 20px rgba(0, 255, 136, 0.4);
         }
         
         .progress-bar {
@@ -85,56 +81,53 @@
         
         .progress-fill {
             height: 100%;
-            background: #2E86AB;
+            background: #00ff88;
             width: 0%;
             transition: width 0.3s;
         }
         
-        .hint {
+        .packet-info {
             position: absolute;
-            top: 10px;
+            top: 50%;
             right: 10px;
-            background: rgba(46, 134, 171, 0.9);
+            background: rgba(0,0,0,0.9);
             color: white;
-            padding: 8px 12px;
-            border-radius: 20px;
+            padding: 15px;
+            border-radius: 10px;
             z-index: 1000;
-            font-size: 12px;
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0% { opacity: 0.7; }
-            50% { opacity: 1; }
-            100% { opacity: 0.7; }
+            max-width: 250px;
+            border: 2px solid #0099ff;
+            display: none;
         }
     </style>
 </head>
 <body>
     <div class="loading" id="loading">
-        <div>⚙️ Загрузка AR-визитки...</div>
+        <div>🌐 Загрузка сетевой визуализации...</div>
         <div class="progress-bar">
             <div class="progress-fill" id="progressFill"></div>
         </div>
-        <div style="font-size: 14px; margin-top: 10px;" id="loadStatus">Инициализация промышленной AR сцены...</div>
+        <div style="font-size: 14px; margin-top: 10px;" id="loadStatus">Инициализация сетевых компонентов...</div>
     </div>
     
     <div class="instruction">
-        <h3>🏭 СтанМашСтуд</h3>
-        <p>• Наведите камеру на маркер визитки</p>
-        <p>• Изучите 3D модели оборудования</p>
-        <p>• Используйте кнопки для связи</p>
-        <div id="markerStatus" style="color: #ff4444; margin-top: 10px;">❌ Ожидание маркера визитки...</div>
+        <h3>🔄 AR Сетевая топология</h3>
+        <p>• Наведите камеру на маркер</p>
+        <p>• Наблюдайте передачу пакетов</p>
+        <p>• Используйте кнопки управления</p>
+        <div id="markerStatus" style="color: #ff4444; margin-top: 10px;">❌ Ожидание маркера...</div>
     </div>
 
-    <div class="hint" id="hint" style="display: none;">
-        📱 Наведите на визитку
+    <div class="packet-info" id="packetInfo">
+        <h4 style="margin: 0 0 10px 0; color: #00ff88;">📦 Пакет данных</h4>
+        <div id="packetDetails">Информация о текущем пакете</div>
     </div>
 
-    <div class="ar-buttons" id="arButtons" style="display: none;">
-        <button class="ar-btn" onclick="callPhone()">📞 Позвонить</button>
-        <button class="ar-btn" onclick="showPortfolio()">📊 Проекты</button>
-        <button class="ar-btn" onclick="visitWebsite()">🌐 Сайт</button>
+    <div class="controls" id="controls" style="display: none;">
+        <button class="control-btn" onclick="startTransmission()">▶️ Старт</button>
+        <button class="control-btn" onclick="pauseTransmission()">⏸️ Пауза</button>
+        <button class="control-btn" onclick="resetTransmission()">🔄 Сброс</button>
+        <button class="control-btn" onclick="showProtocolInfo()">📊 Протоколы</button>
     </div>
 
     <a-scene 
@@ -149,7 +142,7 @@
         vr-mode-ui="enabled: false"
         loading-screen="enabled:false">
         
-        <!-- Маркер для визитной карточки -->
+        <!-- Маркер для сетевой визуализации -->
         <a-marker 
             type="pattern" 
             url="pc-marker.patt"
@@ -158,110 +151,98 @@
             smoothTolerance="0.01"
             emitevents="true"
             size="0.16"
-            id="cardMarker">
+            id="networkMarker">
             
-            <!-- Основная сцена станкостроения -->
-            <a-entity position="0 0.3 0" scale="0.8 0.8 0.8" rotation="0 0 0">
+            <!-- Сетевая топология -->
+            <a-entity position="0 0.3 0" scale="0.7 0.7 0.7" rotation="0 0 0">
                 
-                <!-- Вращающийся шпиндель станка -->
-                <a-entity 
-                    geometry="primitive: cylinder; radius: 0.08; height: 0.3"
-                    material="color: #2E86AB; shader: standard; metalness: 0.8; roughness: 0.2"
-                    position="0 0.4 0"
-                    animation="property: rotation; to: 360 0 0; loop: true; dur: 3000"
-                    class="clickable"
-                    data-info="Шпиндель ЧПУ станка - скорость до 24,000 об/мин, точность позиционирования 0.001мм">
+                <!-- Компьютер 1 (отправитель) -->
+                <a-entity id="pc1" position="-0.8 0.4 0">
+                    <a-entity 
+                        geometry="primitive: box; width: 0.15; height: 0.1; depth: 0.05"
+                        material="color: #00ff88; shader: standard"
+                        class="clickable"
+                        data-info="ПК1 - Отправитель&#10;IP: 192.168.1.10&#10;MAC: AA:BB:CC:DD:EE:01">
+                    </a-entity>
+                    <a-entity 
+                        text="value: ПК1; color: white; align: center; width: 0.5"
+                        position="0 -0.08 0"
+                        scale="0.3 0.3 0.3">
+                    </a-entity>
                 </a-entity>
                 
-                <!-- Деталь на станке -->
-                <a-entity 
-                    geometry="primitive: box; width: 0.15; height: 0.05; depth: 0.1"
-                    material="color: #F18F01; shader: standard"
-                    position="0 0.25 0.1"
-                    animation="property: position; to: 0.1 0.25 0.1; loop: true; dir: alternate; dur: 4000"
-                    class="clickable"
-                    data-info="Обрабатываемая деталь - алюминиевый сплав, допуск ±0.01мм">
+                <!-- Коммутатор (Switch) -->
+                <a-entity id="switch" position="0 0.4 0">
+                    <a-entity 
+                        geometry="primitive: box; width: 0.2; height: 0.12; depth: 0.08"
+                        material="color: #0099ff; shader: standard"
+                        class="clickable"
+                        data-info="Коммутатор L2&#10;8 портов 1Gb/s&#10;MAC-таблица: динамическая">
+                    </a-entity>
+                    <a-entity 
+                        text="value: SWITCH; color: white; align: center; width: 0.8"
+                        position="0 -0.1 0"
+                        scale="0.25 0.25 0.25">
+                    </a-entity>
                 </a-entity>
                 
-                <!-- Режущий инструмент -->
-                <a-entity 
-                    geometry="primitive: cone; radiusBottom: 0.03; radiusTop: 0.01; height: 0.15"
-                    material="color: #C73E1D; shader: standard; metalness: 0.9"
-                    position="0.2 0.35 0"
-                    animation="property: rotation; to: 0 180 0; loop: true; dir: alternate; dur: 5000"
-                    class="clickable"
-                    data-info="Фреза для чистовой обработки - твердый сплав, 4 зубья">
+                <!-- Роутер -->
+                <a-entity id="router" position="0.8 0.4 0">
+                    <a-entity 
+                        geometry="primitive: cylinder; radius: 0.1; height: 0.08"
+                        material="color: #ff4444; shader: standard"
+                        class="clickable"
+                        data-info="Маршрутизатор&#10;WAN: 85.214.132.10&#10;LAN: 192.168.1.1&#10;NAT: включен">
+                    </a-entity>
+                    <a-entity 
+                        text="value: ROUTER; color: white; align: center; width: 0.8"
+                        position="0 -0.08 0"
+                        scale="0.25 0.25 0.25">
+                    </a-entity>
                 </a-entity>
                 
-                <!-- Система ЧПУ -->
-                <a-entity 
-                    geometry="primitive: box; width: 0.2; height: 0.08; depth: 0.05"
-                    material="color: #333; shader: standard"
-                    position="-0.25 0.3 0"
-                    class="clickable"
-                    data-info="Система ЧПУ - 5-осевая обработка, поддержка G-кодов">
+                <!-- Компьютер 2 (получатель) -->
+                <a-entity id="pc2" position="1.6 0.4 0">
+                    <a-entity 
+                        geometry="primitive: box; width: 0.15; height: 0.1; depth: 0.05"
+                        material="color: #ffaa00; shader: standard"
+                        class="clickable"
+                        data-info="ПК2 - Получатель&#10;IP: 192.168.1.20&#10;MAC: AA:BB:CC:DD:EE:02">
+                    </a-entity>
+                    <a-entity 
+                        text="value: ПК2; color: white; align: center; width: 0.5"
+                        position="0 -0.08 0"
+                        scale="0.3 0.3 0.3">
+                    </a-entity>
                 </a-entity>
                 
-                <!-- Логотип компании -->
-                <a-entity 
-                    geometry="primitive: torus; radius: 0.1; radiusTubular: 0.02"
-                    material="color: #A23B72; shader: standard"
-                    position="0 0.6 0"
-                    animation="property: rotation; to: 0 360 0; loop: true; dur: 8000"
-                    class="clickable"
-                    data-info="СтанМашСтуд - инновации в станкостроении с 2010 года">
+                <!-- Сетевые соединения -->
+                <a-entity line="start: -0.65 0.4 0; end: -0.1 0.4 0; color: #00ff88" id="line1"></a-entity>
+                <a-entity line="start: 0.1 0.4 0; end: 0.65 0.4 0; color: #00ff88" id="line2"></a-entity>
+                <a-entity line="start: 0.95 0.4 0; end: 1.45 0.4 0; color: #00ff88" id="line3"></a-entity>
+                
+                <!-- Анимированные пакеты данных -->
+                <a-entity id="packetContainer">
+                    <!-- Пакет будет создаваться динамически -->
                 </a-entity>
                 
-                <!-- Текстовые элементы -->
+                <!-- Трассировка маршрута -->
                 <a-entity 
-                    text="value: СтанМашСтуд; color: #2E86AB; align: center; width: 2.5"
-                    position="0 0.15 0"
-                    scale="0.6 0.6 0.6">
+                    text="value: ПК1 → SWITCH → ROUTER → SWITCH → ПК2; color: #ffffff; align: center; width: 6"
+                    position="0 0.7 0"
+                    scale="0.2 0.2 0.2">
                 </a-entity>
                 
+                <!-- Информация о протоколах -->
                 <a-entity 
-                    text="value: Инжиниринг и производство; color: white; align: center; width: 3"
-                    position="0 0.08 0"
-                    scale="0.3 0.3 0.3">
-                </a-entity>
-                
-                <a-entity 
-                    text="value: ЧПУ станки • Автоматизация • Робототехника; color: #F18F01; align: center; width: 4"
-                    position="0 0.02 0"
-                    scale="0.25 0.25 0.25">
-                </a-entity>
-                
-                <!-- Анимированные искры обработки -->
-                <a-entity id="sparks">
-                    <a-entity geometry="primitive: sphere; radius: 0.008" material="color: #FFEAA7" 
-                             position="0.15 0.3 0.05" animation="property: position; to: 0.18 0.35 0.08; loop: true; dur: 300"></a-entity>
-                    <a-entity geometry="primitive: sphere; radius: 0.006" material="color: #FFEAA7" 
-                             position="0.12 0.28 0.06" animation="property: position; to: 0.14 0.33 0.09; loop: true; dur: 400"></a-entity>
-                    <a-entity geometry="primitive: sphere; radius: 0.007" material="color: #FFEAA7" 
-                             position="0.14 0.29 0.04" animation="property: position; to: 0.16 0.34 0.07; loop: true; dur: 350"></a-entity>
-                </a-entity>
-                
-                <!-- Конвейерная лента -->
-                <a-entity 
-                    geometry="primitive: plane; width: 0.4; height: 0.05"
-                    material="color: #666; side: double"
-                    position="0 -0.1 0"
-                    rotation="-90 0 0">
-                </a-entity>
-                
-                <!-- Детали на конвейере -->
-                <a-entity 
-                    geometry="primitive: box; width: 0.06; height: 0.03; depth: 0.04"
-                    material="color: #F18F01"
-                    position="-0.15 -0.08 0"
-                    animation="property: position; to: 0.15 -0.08 0; loop: true; dur: 6000">
+                    text="value: Ethernet → IP → TCP → HTTP; color: #ffaa00; align: center; width: 4"
+                    position="0 0.65 0"
+                    scale="0.15 0.15 0.15">
                 </a-entity>
                 
                 <!-- Освещение -->
                 <a-light type="ambient" color="#ffffff" intensity="0.6"></a-light>
-                <a-light type="directional" position="2 5 3" intensity="0.8" color="#ffffff"></a-light>
-                <a-light type="point" position="0 2 2" intensity="0.5" color="#2E86AB"></a-light>
-                <a-light type="point" position="1 1 1" intensity="0.3" color="#F18F01"></a-light>
+                <a-light type="directional" position="0 5 3" intensity="0.8" color="#ffffff"></a-light>
                 
             </a-entity>
             
@@ -272,6 +253,10 @@
     </a-scene>
 
     <script>
+        let isTransmissionActive = false;
+        let currentPacket = null;
+        let packetSequence = 0;
+        
         // Симуляция загрузки
         let loadProgress = 0;
         const loadInterval = setInterval(() => {
@@ -281,7 +266,6 @@
                 clearInterval(loadInterval);
                 setTimeout(() => {
                     document.getElementById('loading').style.display = 'none';
-                    document.getElementById('hint').style.display = 'block';
                 }, 500);
             }
             document.getElementById('progressFill').style.width = loadProgress + '%';
@@ -289,73 +273,141 @@
         }, 200);
         
         // Отслеживание маркера
-        const marker = document.getElementById('cardMarker');
+        const marker = document.getElementById('networkMarker');
         const statusDiv = document.getElementById('markerStatus');
-        const buttonsDiv = document.getElementById('arButtons');
-        const hintDiv = document.getElementById('hint');
+        const controlsDiv = document.getElementById('controls');
         
         marker.addEventListener('markerFound', () => {
-            statusDiv.innerHTML = '✅ Визитка распознана!';
+            statusDiv.innerHTML = '✅ Сетевая топология активирована!';
             statusDiv.style.color = '#00ff00';
-            buttonsDiv.style.display = 'flex';
-            hintDiv.style.display = 'none';
+            controlsDiv.style.display = 'flex';
         });
         
         marker.addEventListener('markerLost', () => {
-            statusDiv.innerHTML = '❌ Ожидание маркера визитки...';
+            statusDiv.innerHTML = '❌ Ожидание маркера...';
             statusDiv.style.color = '#ff4444';
-            buttonsDiv.style.display = 'none';
-            hintDiv.style.display = 'block';
+            controlsDiv.style.display = 'none';
+            stopTransmission();
         });
         
-        // Функции для кнопок
-        function callPhone() {
-            alert('📞 СтанМашСтуд\nТел: +7 (495) 123-45-67\nОтдел продаж: доб. 101\nТехподдержка: доб. 102');
+        // Функции управления передачей
+        function startTransmission() {
+            if (!isTransmissionActive) {
+                isTransmissionActive = true;
+                createPacket();
+            }
         }
         
-        function showPortfolio() {
-            alert('🏭 Наши проекты:\n\n• ЧПУ станки 5-осевые\n• Роботизированные линии\n• Автоматизация цехов\n• Системы контроля качества\n• Производство оснастки');
+        function pauseTransmission() {
+            isTransmissionActive = false;
+            if (currentPacket) {
+                currentPacket.removeAttribute('animation');
+            }
         }
         
-        function visitWebsite() {
-            alert('🌐 Переход на сайт stanmashstud.ru\n\nКаталог оборудования →\nТехническая документация →\nОнлайн-запрос коммерческого предложения →');
+        function resetTransmission() {
+            stopTransmission();
+            packetSequence = 0;
+            document.getElementById('packetInfo').style.display = 'none';
         }
         
-        // Обработка кликов по 3D объектам
+        function stopTransmission() {
+            isTransmissionActive = false;
+            const packetContainer = document.getElementById('packetContainer');
+            packetContainer.innerHTML = '';
+            currentPacket = null;
+        }
+        
+        function createPacket() {
+            if (!isTransmissionActive) return;
+            
+            packetSequence++;
+            const packetId = `packet_${packetSequence}`;
+            
+            // Создание пакета
+            const packet = document.createElement('a-entity');
+            packet.setAttribute('id', packetId);
+            packet.setAttribute('geometry', 'primitive: box; width: 0.04; height: 0.04; depth: 0.02');
+            packet.setAttribute('material', 'color: #ff4444; shader: standard');
+            packet.setAttribute('position', '-0.65 0.4 0');
+            
+            // Анимация движения пакета по маршруту
+            packet.setAttribute('animation', {
+                property: 'position',
+                from: '-0.65 0.4 0',
+                to: '-0.1 0.4 0',
+                dur: 2000,
+                startEvents: 'start'
+            });
+            
+            document.getElementById('packetContainer').appendChild(packet);
+            currentPacket = packet;
+            
+            // Обновление информации о пакете
+            updatePacketInfo('📤 Отправка с ПК1', `Пакет #${packetSequence}<br>От: 192.168.1.10<br>К: 192.168.1.20<br>Протокол: Ethernet`);
+            
+            // Последовательная анимация через всю сеть
+            setTimeout(() => {
+                if (!isTransmissionActive) return;
+                packet.setAttribute('animation', {
+                    property: 'position',
+                    from: '-0.1 0.4 0',
+                    to: '0.65 0.4 0',
+                    dur: 2000
+                });
+                updatePacketInfo('🔄 Маршрутизация', `Пакет #${packetSequence}<br>Через: 192.168.1.1<br>NAT преобразование<br>Протокол: IP`);
+            }, 2000);
+            
+            setTimeout(() => {
+                if (!isTransmissionActive) return;
+                packet.setAttribute('animation', {
+                    property: 'position',
+                    from: '0.65 0.4 0',
+                    to: '0.95 0.4 0',
+                    dur: 1500
+                });
+                updatePacketInfo('📥 Доставка на ПК2', `Пакет #${packetSequence}<br>Получен: 192.168.1.20<br>Порт: 80 (HTTP)<br>Статус: Успешно`);
+            }, 4000);
+            
+            setTimeout(() => {
+                if (!isTransmissionActive) return;
+                packet.remove();
+                if (isTransmissionActive) {
+                    setTimeout(() => createPacket(), 1000);
+                }
+            }, 5500);
+        }
+        
+        function updatePacketInfo(title, details) {
+            const infoDiv = document.getElementById('packetInfo');
+            infoDiv.innerHTML = `<h4 style="margin: 0 0 10px 0; color: #00ff88;">${title}</h4><div>${details}</div>`;
+            infoDiv.style.display = 'block';
+        }
+        
+        function showProtocolInfo() {
+            alert('📊 Сетевые протоколы:\n\n' +
+                  '• Ethernet (L2) - кадровая передача\n' +
+                  '• IP (L3) - маршрутизация\n' + 
+                  '• TCP (L4) - надежная доставка\n' +
+                  '• HTTP (L7) - прикладной уровень\n\n' +
+                  'MTU: 1500 байт\nTTL: 64');
+        }
+        
+        // Обработка кликов по сетевым устройствам
         document.querySelector('a-scene').addEventListener('click', function(evt) {
             const clickedEl = evt.detail.intersection?.object.el;
             if (clickedEl && clickedEl.classList.contains('clickable')) {
                 const info = clickedEl.getAttribute('data-info');
                 if (info) {
-                    alert('⚙️ ' + info);
-                }
-                
-                // Анимация при клике
-                const originalScale = clickedEl.getAttribute('scale') || {x:1, y:1, z:1};
-                clickedEl.setAttribute('animation', {
-                    property: 'scale',
-                    to: `${originalScale.x * 1.3} ${originalScale.y * 1.3} ${originalScale.z * 1.3}`,
-                    dur: 300,
-                    easing: 'easeOutElastic'
-                });
-                
-                setTimeout(() => {
-                    clickedEl.setAttribute('animation', {
-                        property: 'scale', 
-                        to: `${originalScale.x} ${originalScale.y} ${originalScale.z}`,
-                        dur: 500,
-                        easing: 'easeOutElastic'
+                    const lines = info.split('&#10;');
+                    let alertText = '';
+                    lines.forEach(line => {
+                        alertText += line + '\n';
                     });
-                }, 1000);
+                    alert('🔧 Сетевое устройство:\n\n' + alertText);
+                }
             }
         });
-        
-        // Авто-скрытие инструкций через 25 секунд
-        setTimeout(() => {
-            const instruction = document.querySelector('.instruction');
-            instruction.style.opacity = '0.7';
-            instruction.style.transition = 'opacity 3s';
-        }, 25000);
     </script>
 </body>
 </html>
