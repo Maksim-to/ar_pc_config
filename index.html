@@ -2,17 +2,26 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <title>AR Router-on-a-Stick Топология</title>
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
         body {
             margin: 0;
             padding: 0;
             overflow: hidden;
             background: #000;
             font-family: Arial, sans-serif;
+            width: 100vw;
+            height: 100vh;
+            position: fixed;
         }
         
         .help-btn {
@@ -143,7 +152,7 @@
             border-radius: 8px;
             z-index: 1000;
             max-width: 200px;
-            border: 2px solid #888888;
+            border: 2px solid #666666;
             font-size: 11px;
         }
     </style>
@@ -183,7 +192,7 @@
             <span>Роутер (L3)</span>
         </div>
         <div style="display: flex; align-items: center; margin: 5px 0;">
-            <div style="width: 12px; height: 12px; background: #888888; border-radius: 2px; margin-right: 8px;"></div>
+            <div style="width: 12px; height: 12px; background: #666666; border-radius: 2px; margin-right: 8px;"></div>
             <span>Коммутатор (L2)</span>
         </div>
         <div style="display: flex; align-items: center; margin: 5px 0;">
@@ -257,11 +266,11 @@
                     <a-entity 
                         obj-model="obj: url(switch.obj)"
                         position="0 0 0"
-                        scale="0.0006 0.0006 0.0006" <!-- Изменено с 0.0003 на 0.0006 (увеличение в 2 раза) -->
+                        scale="0.0006 0.0006 0.0006"
                         rotation="0 0 0"
-                        material="color: #888888; metalness: 0.4; roughness: 0.6" <!-- Изменен цвет на серый -->
+                        material="color: #666666; metalness: 0.4; roughness: 0.6"
                         class="clickable"
-                        data-info="Коммутатор L2&#10;Port1: VLAN 10 (Access)&#10;Port2: VLAN 20 (Access)&#10;Port3: VLAN 10,20 (Trunk)">
+                        data-info="Коммутатор L2&#10;Port1: VLAN 10 (Access)&#10;Port2: VLAN 20 (Access)&#10;Port3: VLAN 10,20 (Trunk)&#10;Trunk порт подключен к роутеру">
                     </a-entity>
                     <a-entity 
                         text="value: SWITCH; color: white; align: center; width: 1.2"
