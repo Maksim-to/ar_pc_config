@@ -132,6 +132,20 @@
             font-size: 12px;
             border: 1px solid #ff4444;
         }
+        
+        .legend {
+            position: absolute;
+            top: 60px;
+            left: 10px;
+            background: rgba(0,0,0,0.9);
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            z-index: 1000;
+            max-width: 200px;
+            border: 2px solid #888888;
+            font-size: 11px;
+        }
     </style>
 </head>
 <body>
@@ -160,6 +174,26 @@
     <div class="vlan-info" id="vlanInfo">
         <h4 style="margin: 0 0 8px 0; color: #00ff88; font-size: 14px;">🏷️ VLAN Маршрутизация</h4>
         <div id="vlanDetails" style="font-size: 11px; line-height: 1.3;">Информация о меж VLAN передаче</div>
+    </div>
+
+    <div class="legend" id="legend">
+        <h4 style="margin: 0 0 8px 0; color: #00ff88; font-size: 14px;">📋 Легенда устройств</h4>
+        <div style="display: flex; align-items: center; margin: 5px 0;">
+            <div style="width: 12px; height: 12px; background: #ffaa00; border-radius: 2px; margin-right: 8px;"></div>
+            <span>Роутер (L3)</span>
+        </div>
+        <div style="display: flex; align-items: center; margin: 5px 0;">
+            <div style="width: 12px; height: 12px; background: #888888; border-radius: 2px; margin-right: 8px;"></div>
+            <span>Коммутатор (L2)</span>
+        </div>
+        <div style="display: flex; align-items: center; margin: 5px 0;">
+            <div style="width: 12px; height: 12px; background: #0099ff; border-radius: 2px; margin-right: 8px;"></div>
+            <span>ПК1 (VLAN 10)</span>
+        </div>
+        <div style="display: flex; align-items: center; margin: 5px 0;">
+            <div style="width: 12px; height: 12px; background: #ff4444; border-radius: 2px; margin-right: 8px;"></div>
+            <span>ПК2 (VLAN 20)</span>
+        </div>
     </div>
 
     <div class="controls" id="controls" style="display: none;">
@@ -219,13 +253,13 @@
                 
                 <!-- Уровень 2: Коммутатор (дальше от пользователя) -->
                 <a-entity id="switch" position="0 0.1 0.05">
-                    <!-- 3D модель коммутатора - УМЕНЬШЕНА В 500 РАЗ (100 × 5) -->
+                    <!-- 3D модель коммутатора - УВЕЛИЧЕНА В 2 РАЗА И СЕРЫЙ ЦВЕТ -->
                     <a-entity 
                         obj-model="obj: url(switch.obj)"
                         position="0 0 0"
-                        scale="0.0003 0.0003 0.0003" <!-- Изменено с 0.0015 на 0.0003 (уменьшение в 5 раз) -->
+                        scale="0.0006 0.0006 0.0006" <!-- Изменено с 0.0003 на 0.0006 (увеличение в 2 раза) -->
                         rotation="0 0 0"
-                        material="color: #666666; metalness: 0.4; roughness: 0.6"
+                        material="color: #888888; metalness: 0.4; roughness: 0.6" <!-- Изменен цвет на серый -->
                         class="clickable"
                         data-info="Коммутатор L2&#10;Port1: VLAN 10 (Access)&#10;Port2: VLAN 20 (Access)&#10;Port3: VLAN 10,20 (Trunk)">
                     </a-entity>
