@@ -196,12 +196,12 @@
             <a-entity position="0 0 0" scale="0.8 0.8 0.8" rotation="0 0 0">
                 
                 <!-- Уровень 1: Роутер (ближе к пользователю) -->
-                <a-entity id="router" position="0 0.15 -0.35">
-                    <!-- 3D модель роутера -->
+                <a-entity id="router" position="0 0.1 -0.35">
+                    <!-- 3D модель роутера - уменьшенная до размеров ПК -->
                     <a-entity 
                         obj-model="obj: url(router.obj)"
                         position="0 0 0"
-                        scale="0.15 0.15 0.15"
+                        scale="0.1 0.1 0.1"
                         rotation="0 0 0"
                         material="color: #ffaa00; metalness: 0.3; roughness: 0.7"
                         class="clickable"
@@ -209,21 +209,21 @@
                     </a-entity>
                     <a-entity 
                         text="value: ROUTER; color: white; align: center; width: 1.0"
-                        position="0 -0.2 0"
+                        position="0 -0.15 0"
                         scale="0.25 0.25 0.25">
                     </a-entity>
                     
                     <!-- Порты роутера -->
-                    <a-entity geometry="primitive: sphere; radius: 0.015; material: color: #00ff88" position="0 0.1 -0.08"></a-entity>
+                    <a-entity geometry="primitive: sphere; radius: 0.015; material: color: #00ff88" position="0 0.08 -0.06"></a-entity>
                 </a-entity>
                 
                 <!-- Уровень 2: Коммутатор (дальше от пользователя) -->
-                <a-entity id="switch" position="0 0.15 0.05">
+                <a-entity id="switch" position="0 0.1 0.05">
                     <!-- 3D модель коммутатора -->
                     <a-entity 
                         obj-model="obj: url(switch.obj)"
                         position="0 0 0"
-                        scale="0.2 0.2 0.2"
+                        scale="0.15 0.15 0.15"
                         rotation="0 0 0"
                         material="color: #666666; metalness: 0.4; roughness: 0.6"
                         class="clickable"
@@ -231,19 +231,19 @@
                     </a-entity>
                     <a-entity 
                         text="value: SWITCH; color: white; align: center; width: 1.2"
-                        position="0 -0.25 0"
+                        position="0 -0.2 0"
                         scale="0.25 0.25 0.25">
                     </a-entity>
                     
                     <!-- Порты коммутатора -->
-                    <a-entity geometry="primitive: sphere; radius: 0.015; material: color: #0099ff" position="-0.12 0.1 0.06"></a-entity>
-                    <a-entity geometry="primitive: sphere; radius: 0.015; material: color: #ff4444" position="0.12 0.1 0.06"></a-entity>
-                    <a-entity geometry="primitive: sphere; radius: 0.015; material: color: #00ff88" position="0 0.1 -0.06"></a-entity>
+                    <a-entity geometry="primitive: sphere; radius: 0.015; material: color: #0099ff" position="-0.1 0.08 0.05"></a-entity>
+                    <a-entity geometry="primitive: sphere; radius: 0.015; material: color: #ff4444" position="0.1 0.08 0.05"></a-entity>
+                    <a-entity geometry="primitive: sphere; radius: 0.015; material: color: #00ff88" position="0 0.08 -0.05"></a-entity>
                 </a-entity>
                 
                 <!-- Уровень 3: Компьютеры (самые дальние от пользователя) -->
                 <!-- ПК1 (VLAN 10) -->
-                <a-entity id="pc1" position="-0.4 0.1 0.45">
+                <a-entity id="pc1" position="-0.4 0.08 0.45">
                     <!-- 3D модель компьютера -->
                     <a-entity 
                         obj-model="obj: url(computer.obj)"
@@ -270,7 +270,7 @@
                 </a-entity>
                 
                 <!-- ПК2 (VLAN 20) -->
-                <a-entity id="pc2" position="0.4 0.1 0.45">
+                <a-entity id="pc2" position="0.4 0.08 0.45">
                     <!-- 3D модель компьютера -->
                     <a-entity 
                         obj-model="obj: url(computer.obj)"
@@ -298,13 +298,13 @@
                 
                 <!-- Сетевые соединения (правильно подключенные к портам) -->
                 <!-- Роутер -> Коммутатор (Trunk, увеличенная длина) -->
-                <a-entity line="start: 0 0.15 -0.29; end: 0 0.15 -0.005; color: #00ff88; opacity: 0.8" id="lineRouterSwitch"></a-entity>
+                <a-entity line="start: 0 0.1 -0.29; end: 0 0.1 -0.005; color: #00ff88; opacity: 0.8" id="lineRouterSwitch"></a-entity>
                 
                 <!-- Коммутатор -> ПК1 (VLAN 10) -->
-                <a-entity line="start: -0.12 0.15 0.005; end: -0.35 0.15 0.425; color: #0099ff; opacity: 0.8" id="lineSwitchPc1"></a-entity>
+                <a-entity line="start: -0.1 0.1 0.005; end: -0.35 0.1 0.425; color: #0099ff; opacity: 0.8" id="lineSwitchPc1"></a-entity>
                 
                 <!-- Коммутатор -> ПК2 (VLAN 20) -->
-                <a-entity line="start: 0.12 0.15 0.005; end: 0.35 0.15 0.425; color: #ff4444; opacity: 0.8" id="lineSwitchPc2"></a-entity>
+                <a-entity line="start: 0.1 0.1 0.005; end: 0.35 0.1 0.425; color: #ff4444; opacity: 0.8" id="lineSwitchPc2"></a-entity>
                 
                 <!-- Анимированные пакеты (точки вдоль кабелей) -->
                 <a-entity id="packetContainer">
@@ -446,11 +446,11 @@
             packet.setAttribute('material', `color: ${sourceColor}; shader: standard; emissive: ${sourceColor}; emissiveIntensity: 0.5`);
             
             // Начальная позиция - от порта ПК
-            const startPos = isVlan10to20 ? '-0.35 0.15 0.425' : '0.35 0.15 0.425';
+            const startPos = isVlan10to20 ? '-0.35 0.1 0.425' : '0.35 0.1 0.425';
             packet.setAttribute('position', startPos);
             
             // Этап 1: От ПК к коммутатору (вдоль кабеля)
-            const switchPos = isVlan10to20 ? '-0.12 0.15 0.005' : '0.12 0.15 0.005';
+            const switchPos = isVlan10to20 ? '-0.1 0.1 0.005' : '0.1 0.1 0.005';
             
             packet.setAttribute('animation', {
                 property: 'position',
@@ -475,7 +475,7 @@
                 packet.setAttribute('animation', {
                     property: 'position',
                     from: switchPos,
-                    to: '0 0.15 -0.29',
+                    to: '0 0.1 -0.29',
                     dur: 2000
                 });
                 updateVlanInfo(
@@ -490,8 +490,8 @@
                 packet.setAttribute('material', `color: #00ff88; emissive: #00ff88`);
                 packet.setAttribute('animation', {
                     property: 'position',
-                    from: '0 0.15 -0.29',
-                    to: '0 0.15 -0.32',
+                    from: '0 0.1 -0.29',
+                    to: '0 0.1 -0.32',
                     dur: 1000
                 });
                 updateVlanInfo(
@@ -506,8 +506,8 @@
                 packet.setAttribute('material', `color: ${destColor}; emissive: ${destColor}`);
                 packet.setAttribute('animation', {
                     property: 'position',
-                    from: '0 0.15 -0.32',
-                    to: '0 0.15 -0.005',
+                    from: '0 0.1 -0.32',
+                    to: '0 0.1 -0.005',
                     dur: 1800
                 });
                 updateVlanInfo(
@@ -519,12 +519,12 @@
             // Этап 5: Коммутатор -> Получатель (вдоль кабеля)
             setTimeout(() => {
                 if (!isTransmissionActive) return;
-                const destSwitchPos = isVlan10to20 ? '0.12 0.15 0.005' : '-0.12 0.15 0.005';
-                const destPos = isVlan10to20 ? '0.35 0.15 0.425' : '-0.35 0.15 0.425';
+                const destSwitchPos = isVlan10to20 ? '0.1 0.1 0.005' : '-0.1 0.1 0.005';
+                const destPos = isVlan10to20 ? '0.35 0.1 0.425' : '-0.35 0.1 0.425';
                 
                 packet.setAttribute('animation', {
                     property: 'position',
-                    from: '0 0.15 -0.005',
+                    from: '0 0.1 -0.005',
                     to: destSwitchPos,
                     dur: 1500
                 });
