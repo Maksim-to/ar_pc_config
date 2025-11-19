@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-    <title>AR Архитектура ПК - Все файлы в одной папке</title>
+    <title>AR Визитная карточка - Все файлы в одной папке</title>
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
     <style>
@@ -25,7 +25,7 @@
             border-radius: 10px;
             z-index: 1000;
             max-width: 350px;
-            border: 2px solid #00ff00;
+            border: 2px solid #ff6b35;
         }
         
         .loading {
@@ -59,29 +59,36 @@
             border: 2px solid #333;
         }
         
-        .component-info {
+        .ar-buttons {
             position: absolute;
-            top: 50%;
+            bottom: 120px;
             left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0,0,0,0.95);
-            color: white;
-            padding: 25px;
-            border-radius: 15px;
-            max-width: 400px;
-            display: none;
-            z-index: 1001;
-            border: 3px solid #0066cc;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 1000;
         }
         
-        .close-btn {
-            background: #ff4444;
+        .ar-btn {
+            background: linear-gradient(45deg, #ff6b35, #ff8e53);
             color: white;
             border: none;
-            padding: 8px 16px;
-            border-radius: 5px;
+            padding: 12px 20px;
+            border-radius: 25px;
             cursor: pointer;
-            margin-top: 15px;
+            font-size: 14px;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .ar-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4);
+        }
+        
+        .ar-btn:active {
+            transform: translateY(0);
         }
         
         .progress-bar {
@@ -95,7 +102,7 @@
         
         .progress-fill {
             height: 100%;
-            background: #00ff00;
+            background: #ff6b35;
             width: 0%;
             transition: width 0.3s;
         }
@@ -103,30 +110,30 @@
 </head>
 <body>
     <div class="loading" id="loading">
-        <div>🔄 Загрузка AR-сцены...</div>
+        <div>🔄 Загрузка AR-визитки...</div>
         <div class="progress-bar">
             <div class="progress-fill" id="progressFill"></div>
         </div>
-        <div style="font-size: 14px; margin-top: 10px;" id="loadStatus">Инициализация 3D моделей...</div>
+        <div style="font-size: 14px; margin-top: 10px;" id="loadStatus">Инициализация 3D контента...</div>
     </div>
     
     <div class="instruction">
-        <h3>🔧 AR Архитектура ПК</h3>
+        <h3>🚀 AR Визитная карточка</h3>
         <p>• Наведите камеру на маркер справа</p>
-        <p>• Касайтесь компонентов для информации</p>
-        <p>• Используйте жесты для масштабирования</p>
+        <p>• Взаимодействуйте с 3D объектами</p>
+        <p>• Используйте кнопки для действий</p>
         <div id="markerStatus" style="color: #ff4444; margin-top: 10px;">❌ Ожидание маркера...</div>
     </div>
 
-    <div class="component-info" id="componentInfo">
-        <h3 id="infoTitle" style="margin: 0 0 15px 0; color: #00ff00;">Компонент</h3>
-        <div id="infoDescription" style="line-height: 1.5;">Описание компонента</div>
-        <button class="close-btn" onclick="hideInfo()">✕ Закрыть</button>
+    <div class="ar-buttons" id="arButtons" style="display: none;">
+        <button class="ar-btn" onclick="callPhone()">📞 Позвонить</button>
+        <button class="ar-btn" onclick="showPortfolio()">💼 Портфолио</button>
+        <button class="ar-btn" onclick="visitWebsite()">🌐 Сайт</button>
     </div>
 
     <div class="marker-image">
         <p style="margin: 0 0 8px 0; font-weight: bold;">📱 AR Маркер:</p>
-        <img src="pc-marker.png" alt="AR Marker">
+        <img src="card-marker.png" alt="AR Marker">
     </div>
 
     <a-scene 
@@ -139,115 +146,88 @@
         "
         renderer="colorManagement: true; antialias: true;"
         vr-mode-ui="enabled: false"
-        loading-screen="enabled: false">
+        loading-screen="enabled:false">
         
-        <!-- Собственный маркер -->
+        <!-- Маркер для визитной карточки -->
         <a-marker 
             type="pattern" 
-            url="pc-marker.patt"
+            url="card-marker.patt"
             smooth="true"
             smoothCount="5"
             smoothTolerance="0.01"
             emitevents="true"
             size="0.16"
-            id="customMarker">
+            id="cardMarker">
             
-            <!-- Сцена с OBJ моделями (все файлы в корне) -->
-            <a-entity position="0 0.3 0" scale="0.7 0.7 0.7" rotation="0 0 0">
+            <!-- Основная сцена -->
+            <a-entity position="0 0.3 0" scale="0.8 0.8 0.8" rotation="0 0 0">
                 
-                <!-- Материнская плата -->
+                <!-- 3D Логотип (вращающаяся сфера) -->
                 <a-entity 
-                    obj-model="obj: motherboard.obj; mtl: motherboard.mtl"
-                    position="0 0.8 0.1"
-                    scale="0.5 0.5 0.5"
-                    rotation="-90 0 0"
+                    geometry="primitive: sphere; radius: 0.15"
+                    material="color: #ff6b35; shader: standard; metalness: 0.3; roughness: 0.2"
+                    position="0 0.4 0"
+                    animation="property: rotation; to: 0 360 0; loop: true; dur: 10000"
                     class="clickable"
-                    data-component="motherboard"
-                    data-title="Материнская плата ASUS ROG Strix Z790-E"
-                    data-description="Форм-фактор: ATX&#10;Сокет: LGA 1700&#10;Чипсет: Intel Z790&#10;Слоты памяти: 4× DDR5&#10;Порты: 2× USB4, 8× USB 3.2&#10;Сеть: 2.5G Ethernet + Wi-Fi 6E">
+                    data-info="Логотип компании - инновационные решения в AR технологиях">
                 </a-entity>
                 
-                <!-- Процессор -->
+                <!-- Плавающие элементы портфолио -->
                 <a-entity 
-                    obj-model="obj: cpu.obj; mtl: cpu.mtl"
-                    position="0 0.95 0.15"
-                    scale="0.1 0.1 0.1"
-                    rotation="0 0 0"
+                    geometry="primitive: box; width: 0.1; height: 0.1; depth: 0.1"
+                    material="color: #4ECDC4; shader: standard"
+                    position="-0.3 0.3 0"
+                    animation="property: position; to: -0.3 0.5 0; loop: true; dir: alternate; dur: 2000"
                     class="clickable"
-                    data-component="cpu"
-                    data-title="Процессор Intel Core i9-13900K"
-                    data-description="Архитектура: Raptor Lake&#10;Ядра: 24 (8P+16E)&#10;Потоки: 32&#10;Частота: 3.0-5.8 GHz&#10;Кэш L3: 36 MB&#10;TDP: 125W (Turbo 253W)">
+                    data-info="Проект №1: Разработка AR приложений">
                 </a-entity>
                 
-                <!-- Оперативная память -->
                 <a-entity 
-                    obj-model="obj: ram.obj; mtl: ram.mtl"
-                    position="-0.15 0.9 0.12"
-                    scale="0.2 0.2 0.2"
-                    rotation="0 0 0"
+                    geometry="primitive: cylinder; radius: 0.08; height: 0.15"
+                    material="color: #45B7D1; shader: standard"
+                    position="0.25 0.25 0"
+                    animation="property: rotation; to: 0 0 360; loop: true; dur: 8000"
                     class="clickable"
-                    data-component="ram"
-                    data-title="Оперативная память Corsair Vengeance RGB DDR5"
-                    data-description="Объём: 32 GB (2×16 GB)&#10;Тип: DDR5&#10;Частота: 5600 MHz&#10;Тайминги: 36-36-36-76&#10;Напряжение: 1.25V&#10;Подсветка: RGB">
+                    data-info="Проект №2: 3D визуализация и моделирование">
                 </a-entity>
                 
-                <!-- Видеокарта -->
                 <a-entity 
-                    obj-model="obj: gpu.obj; mtl: gpu.mtl"
-                    position="0.25 0.65 0.1"
-                    scale="0.35 0.35 0.35"
-                    rotation="0 0 0"
+                    geometry="primitive: cone; radiusBottom: 0.1; radiusTop: 0; height: 0.2"
+                    material="color: #96CEB4; shader: standard"
+                    position="0.2 0.6 0"
+                    animation="property: position; to: 0.4 0.6 0; loop: true; dir: alternate; dur: 3000"
                     class="clickable"
-                    data-component="gpu"
-                    data-title="Видеокарта NVIDIA GeForce RTX 4080"
-                    data-description="Архитектура: Ada Lovelace&#10;Память: 16 GB GDDR6X&#10;Шина: 256-bit&#10;Тактовая частота: 2205 MHz&#10;Порты: 3× DisplayPort 1.4a, 1× HDMI 2.1&#10;Рекомендуемый БП: 750W">
+                    data-info="Проект №3: Веб-разработка и дизайн">
                 </a-entity>
                 
-                <!-- SSD накопитель -->
+                <!-- Текстовые элементы -->
                 <a-entity 
-                    obj-model="obj: ssd.obj; mtl: ssd.mtl"
-                    position="-0.3 0.7 0.12"
-                    scale="0.25 0.25 0.25"
-                    rotation="0 0 0"
-                    class="clickable"
-                    data-component="ssd"
-                    data-title="SSD накопитель Samsung 980 Pro NVMe"
-                    data-description="Объём: 2 TB&#10;Интерфейс: NVMe PCIe 4.0&#10;Скорость чтения: 7000 MB/s&#10;Скорость записи: 5000 MB/s&#10;Форм-фактор: M.2 2280&#10;Ресурс записи: 1200 TBW">
+                    text="value: Иван Иванов; color: white; align: center; width: 1.5"
+                    position="0 0.15 0"
+                    scale="0.8 0.8 0.8">
                 </a-entity>
                 
-                <!-- Блок питания -->
                 <a-entity 
-                    obj-model="obj: psu.obj; mtl: psu.mtl"
-                    position="0.4 0.3 0.05"
-                    scale="0.3 0.3 0.3"
-                    rotation="0 90 0"
-                    class="clickable"
-                    data-component="psu"
-                    data-title="Блок питания Corsair RM850x"
-                    data-description="Мощность: 850W&#10;Сертификат: 80+ Gold&#10;КПД: до 90%&#10;Разъёмы: 1× 24-pin, 2× 8-pin CPU, 6× 8-pin PCIe&#10;Вентилятор: 135mm гидродинамический&#10;Гарантия: 10 лет">
+                    text="value: AR/VR Разработчик; color: #ff6b35; align: center; width: 2"
+                    position="0 0.05 0"
+                    scale="0.5 0.5 0.5">
                 </a-entity>
                 
-                <!-- Система охлаждения -->
-                <a-entity 
-                    obj-model="obj: cooler.obj; mtl: cooler.mtl"
-                    position="0 1.1 0.1"
-                    scale="0.4 0.4 0.4"
-                    rotation="0 0 0"
-                    class="clickable"
-                    data-component="cooler"
-                    data-title="СЖО NZXT Kraken X73"
-                    data-description="Тип: жидкостное охлаждение&#10;Радиатор: 360mm&#10;Вентиляторы: 3× Aer P 120mm&#10;Совместимость: Intel LGA 1700, AMD AM5&#10;Подсветка: RGB Infinity Mirror">
+                <!-- Анимированные частицы -->
+                <a-entity id="particles">
+                    <a-entity geometry="primitive: sphere; radius: 0.02" material="color: #FFEAA7" 
+                             position="0.1 0.7 0" animation="property: position; to: 0.3 0.9 0; loop: true; dur: 4000"></a-entity>
+                    <a-entity geometry="primitive: sphere; radius: 0.02" material="color: #FFEAA7" 
+                             position="-0.2 0.8 0" animation="property: position; to: -0.4 0.6 0; loop: true; dur: 3500"></a-entity>
+                    <a-entity geometry="primitive: sphere; radius: 0.02" material="color: #FFEAA7" 
+                             position="0.15 0.5 0" animation="property: position; to: -0.15 0.7 0; loop: true; dur: 4500"></a-entity>
                 </a-entity>
-                
-                <!-- Кабели питания -->
-                <a-entity line="start: 0.35 0.45 0.05; end: 0.15 0.75 0.1; color: #ffff00" material="linewidth: 4"></a-entity>
-                <a-entity line="start: 0.35 0.45 0.05; end: -0.25 0.72 0.12; color: #ffff00" material="linewidth: 4"></a-entity>
-                <a-entity line="start: 0.35 0.45 0.05; end: 0 1.05 0.1; color: #ffff00" material="linewidth: 4"></a-entity>
                 
                 <!-- Освещение -->
-                <a-light type="ambient" color="#ffffff" intensity="0.7"></a-light>
-                <a-light type="directional" position="2 5 3" intensity="0.9" color="#ffffff"></a-light>
-                <a-light type="point" position="0 2 2" intensity="0.5" color="#ffffff"></a-light>
+                <a-light type="ambient" color="#ffffff" intensity="0.6"></a-light>
+                <a-light type="directional" position="2 5 3" intensity="0.8" color="#ffffff"></a-light>
+                <a-light type="point" position="0 2 2" intensity="0.4" color="#ff6b35"></a-light>
+                <a-light type="point" position="-2 1 1" intensity="0.3" color="#4ECDC4"></a-light>
                 
             </a-entity>
             
@@ -258,77 +238,68 @@
     </a-scene>
 
     <script>
-        let modelsLoaded = 0;
-        const totalModels = 6;
-        
-        // Отслеживание загрузки сцены
-        document.querySelector('a-scene').addEventListener('loaded', function() {
-            updateProgress('Сцена загружена', 20);
-            startModelLoading();
-        });
-        
-        function startModelLoading() {
-            const models = document.querySelectorAll('[obj-model]');
-            
-            models.forEach((model) => {
-                // Слушаем успешную загрузку
-                model.addEventListener('model-loaded', () => {
-                    modelsLoaded++;
-                    const progress = 20 + (modelsLoaded / totalModels) * 70;
-                    updateProgress(`Модели: ${modelsLoaded}/${totalModels}`, progress);
-                    
-                    if (modelsLoaded === totalModels) {
-                        setTimeout(() => {
-                            updateProgress('Готово!', 100);
-                            setTimeout(() => {
-                                document.getElementById('loading').style.display = 'none';
-                            }, 800);
-                        }, 1000);
-                    }
-                });
-                
-                // Обработка ошибок загрузки
-                model.addEventListener('model-error', (e) => {
-                    console.error('Ошибка загрузки модели:', e.detail);
-                    updateProgress('Ошибка загрузки модели', 0);
-                });
-            });
-        }
-        
-        function updateProgress(text, percent) {
-            document.getElementById('loadStatus').textContent = text;
-            document.getElementById('progressFill').style.width = percent + '%';
-        }
+        // Симуляция загрузки
+        let loadProgress = 0;
+        const loadInterval = setInterval(() => {
+            loadProgress += Math.random() * 15;
+            if (loadProgress >= 100) {
+                loadProgress = 100;
+                clearInterval(loadInterval);
+                setTimeout(() => {
+                    document.getElementById('loading').style.display = 'none';
+                }, 500);
+            }
+            document.getElementById('progressFill').style.width = loadProgress + '%';
+            document.getElementById('loadStatus').textContent = `Загрузка: ${Math.round(loadProgress)}%`;
+        }, 200);
         
         // Отслеживание маркера
-        const marker = document.getElementById('customMarker');
+        const marker = document.getElementById('cardMarker');
         const statusDiv = document.getElementById('markerStatus');
+        const buttonsDiv = document.getElementById('arButtons');
         
         marker.addEventListener('markerFound', () => {
-            statusDiv.innerHTML = '✅ Маркер распознан!';
+            statusDiv.innerHTML = '✅ Визитка активирована!';
             statusDiv.style.color = '#00ff00';
+            buttonsDiv.style.display = 'flex';
         });
         
         marker.addEventListener('markerLost', () => {
             statusDiv.innerHTML = '❌ Ожидание маркера...';
             statusDiv.style.color = '#ff4444';
-            hideInfo();
+            buttonsDiv.style.display = 'none';
         });
         
-        // Обработка кликов по компонентам
+        // Функции для кнопок
+        function callPhone() {
+            alert('📞 Имитация звонка: +7 (999) 123-45-67');
+            // В реальном приложении: window.location.href = 'tel:+79991234567';
+        }
+        
+        function showPortfolio() {
+            alert('💼 Открытие портфолио...\n\n• AR Архитектура ПК\n• Виртуальные выставки\n• Интерактивные презентации\n• 3D Визуализация');
+        }
+        
+        function visitWebsite() {
+            alert('🌐 Переход на сайт portfolio.ru');
+            // В реальном приложении: window.open('https://portfolio.ru', '_blank');
+        }
+        
+        // Обработка кликов по 3D объектам
         document.querySelector('a-scene').addEventListener('click', function(evt) {
             const clickedEl = evt.detail.intersection?.object.el;
             if (clickedEl && clickedEl.classList.contains('clickable')) {
-                const title = clickedEl.getAttribute('data-title');
-                const description = clickedEl.getAttribute('data-description');
-                showComponentInfo(title, description);
+                const info = clickedEl.getAttribute('data-info');
+                if (info) {
+                    alert('💡 ' + info);
+                }
                 
-                // Анимация выделения
-                const originalScale = clickedEl.getAttribute('scale');
+                // Анимация при клике
+                const originalScale = clickedEl.getAttribute('scale') || {x:1, y:1, z:1};
                 clickedEl.setAttribute('animation', {
                     property: 'scale',
-                    to: `${originalScale.x * 1.15} ${originalScale.y * 1.15} ${originalScale.z * 1.15}`,
-                    dur: 400,
+                    to: `${originalScale.x * 1.3} ${originalScale.y * 1.3} ${originalScale.z * 1.3}`,
+                    dur: 300,
                     easing: 'easeOutElastic'
                 });
                 
@@ -336,30 +307,19 @@
                     clickedEl.setAttribute('animation', {
                         property: 'scale', 
                         to: `${originalScale.x} ${originalScale.y} ${originalScale.z}`,
-                        dur: 600,
+                        dur: 500,
                         easing: 'easeOutElastic'
                     });
-                }, 2000);
+                }, 1000);
             }
         });
         
-        function showComponentInfo(title, description) {
-            const infoDiv = document.getElementById('componentInfo');
-            document.getElementById('infoTitle').textContent = title;
-            document.getElementById('infoDescription').innerHTML = description.replace(/&#10;/g, '<br>');
-            infoDiv.style.display = 'block';
-        }
-        
-        function hideInfo() {
-            document.getElementById('componentInfo').style.display = 'none';
-        }
-        
-        // Авто-скрытие инструкций через 15 секунд
+        // Авто-скрытие инструкций через 20 секунд
         setTimeout(() => {
             const instruction = document.querySelector('.instruction');
-            instruction.style.opacity = '0.6';
-            instruction.style.transition = 'opacity 2s';
-        }, 15000);
+            instruction.style.opacity = '0.7';
+            instruction.style.transition = 'opacity 3s';
+        }, 20000);
     </script>
 </body>
 </html>
