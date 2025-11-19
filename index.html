@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <title>AR Router-on-a-Stick Топология</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌐</text></svg>">
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
     <style>
@@ -146,6 +147,54 @@
             border: 2px solid #888888;
             font-size: 11px;
         }
+        
+        /* Скрытие элементов интерфейса AR.js */
+        .a-enter-vr, 
+        .arjs-loader, 
+        .a-loader-title, 
+        .a-canvas-overlay,
+        .a-enter-vr-button {
+            display: none !important;
+        }
+
+        .arjsDebugContainer {
+            opacity: 0 !important;
+            visibility: hidden !important;
+        }
+
+        /* Скрытие отладочной информации */
+        .debug {
+            display: none !important;
+        }
+
+        /* Убедимся, что все наши элементы видны поверх AR.js */
+        .help-btn, .instruction, .loading, .controls, .vlan-info, .marker-status, .legend {
+            z-index: 10000 !important;
+        }
+        
+        /* Дополнительные стили для мобильных устройств */
+        @media (max-width: 768px) {
+            .instruction, .vlan-info, .legend {
+                max-width: 90% !important;
+                left: 5% !important;
+                right: 5% !important;
+            }
+            
+            .instruction {
+                top: 10px !important;
+            }
+            
+            .legend {
+                top: 50% !important;
+                transform: translateY(-50%) !important;
+            }
+        }
+
+        /* Убедитесь, что все элементы интерфейса имеют правильный цвет текста */
+        .instruction, .vlan-info, .legend, .marker-status, .loading {
+            color: white !important;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+        }
     </style>
 </head>
 <body>
@@ -233,11 +282,11 @@
                 <a-entity id="router" position="0 0.1 -0.35">
                     <!-- 3D модель роутера - УМЕНЬШЕНА В 1000 РАЗ ОТ ИСХОДНОГО РАЗМЕРА -->
                     <a-entity 
+                        id="router-model"
                         obj-model="obj: url(router.obj)"
                         position="0 0 0"
                         scale="0.001 0.001 0.001"
                         rotation="0 0 0"
-                        material="color: #ffaa00; metalness: 0.3; roughness: 0.7"
                         class="clickable"
                         data-info="Маршрутизатор&#10;Gi0/0.10: 192.168.10.1/24&#10;Gi0/0.20: 192.168.20.1/24&#10;Router-on-a-Stick конфигурация">
                     </a-entity>
@@ -248,18 +297,18 @@
                     </a-entity>
                     
                     <!-- Порты роутера -->
-                    <a-entity geometry="primitive: sphere; radius: 0.015; material: color: #00ff88" position="0 0.08 -0.06"></a-entity>
+                    <a-entity geometry="primitive: sphere; radius: 0.015" material="color: #00ff88" position="0 0.08 -0.06"></a-entity>
                 </a-entity>
                 
                 <!-- Уровень 2: Коммутатор (дальше от пользователя) -->
                 <a-entity id="switch" position="0 0.1 0.05">
                     <!-- 3D модель коммутатора - УВЕЛИЧЕНА В 2 РАЗА И СЕРЫЙ ЦВЕТ -->
                     <a-entity 
+                        id="switch-model"
                         obj-model="obj: url(switch.obj)"
                         position="0 0 0"
-                        scale="0.0006 0.0006 0.0006" <!-- Изменено с 0.0003 на 0.0006 (увеличение в 2 раза) -->
+                        scale="0.0006 0.0006 0.0006"
                         rotation="0 0 0"
-                        material="color: #888888; metalness: 0.4; roughness: 0.6" <!-- Изменен цвет на серый -->
                         class="clickable"
                         data-info="Коммутатор L2&#10;Port1: VLAN 10 (Access)&#10;Port2: VLAN 20 (Access)&#10;Port3: VLAN 10,20 (Trunk)">
                     </a-entity>
@@ -270,9 +319,9 @@
                     </a-entity>
                     
                     <!-- Порты коммутатора -->
-                    <a-entity geometry="primitive: sphere; radius: 0.015; material: color: #0099ff" position="-0.1 0.08 0.05"></a-entity>
-                    <a-entity geometry="primitive: sphere; radius: 0.015; material: color: #ff4444" position="0.1 0.08 0.05"></a-entity>
-                    <a-entity geometry="primitive: sphere; radius: 0.015; material: color: #00ff88" position="0 0.08 -0.05"></a-entity>
+                    <a-entity geometry="primitive: sphere; radius: 0.015" material="color: #0099ff" position="-0.1 0.08 0.05"></a-entity>
+                    <a-entity geometry="primitive: sphere; radius: 0.015" material="color: #ff4444" position="0.1 0.08 0.05"></a-entity>
+                    <a-entity geometry="primitive: sphere; radius: 0.015" material="color: #00ff88" position="0 0.08 -0.05"></a-entity>
                 </a-entity>
                 
                 <!-- Уровень 3: Компьютеры (самые дальние от пользователя) -->
@@ -280,11 +329,11 @@
                 <a-entity id="pc1" position="-0.4 0.08 0.45">
                     <!-- 3D модель компьютера -->
                     <a-entity 
+                        id="pc1-model"
                         obj-model="obj: url(computer.obj)"
                         position="0 0 0"
                         scale="0.12 0.12 0.12"
                         rotation="0 180 0"
-                        material="color: #0099ff; metalness: 0.2; roughness: 0.8"
                         class="clickable"
                         data-info="ПК1 - VLAN 10&#10;IP: 192.168.10.10/24&#10;MAC: AA:BB:CC:DD:EE:10&#10;Шлюз: 192.168.10.1">
                     </a-entity>
@@ -300,18 +349,18 @@
                     </a-entity>
                     
                     <!-- Порты ПК1 -->
-                    <a-entity geometry="primitive: sphere; radius: 0.012; material: color: #0099ff" position="0 0.08 -0.05"></a-entity>
+                    <a-entity geometry="primitive: sphere; radius: 0.012" material="color: #0099ff" position="0 0.08 -0.05"></a-entity>
                 </a-entity>
                 
                 <!-- ПК2 (VLAN 20) -->
                 <a-entity id="pc2" position="0.4 0.08 0.45">
                     <!-- 3D модель компьютера -->
                     <a-entity 
+                        id="pc2-model"
                         obj-model="obj: url(computer.obj)"
                         position="0 0 0"
                         scale="0.12 0.12 0.12"
                         rotation="0 180 0"
-                        material="color: #ff4444; metalness: 0.2; roughness: 0.8"
                         class="clickable"
                         data-info="ПК2 - VLAN 20&#10;IP: 192.168.20.20/24&#10;MAC: AA:BB:CC:DD:EE:20&#10;Шлюз: 192.168.20.1">
                     </a-entity>
@@ -327,7 +376,7 @@
                     </a-entity>
                     
                     <!-- Порты ПК2 -->
-                    <a-entity geometry="primitive: sphere; radius: 0.012; material: color: #ff4444" position="0 0.08 -0.05"></a-entity>
+                    <a-entity geometry="primitive: sphere; radius: 0.012" material="color: #ff4444" position="0 0.08 -0.05"></a-entity>
                 </a-entity>
                 
                 <!-- Сетевые соединения (правильно подключенные к портам) -->
@@ -393,6 +442,8 @@
                     updateProgress('Готово!', 100);
                     setTimeout(() => {
                         document.getElementById('loading').style.display = 'none';
+                        // Принудительно применяем материалы после загрузки всех моделей
+                        applyMaterialsAfterLoad();
                     }, 800);
                 }, 1000);
             }
@@ -401,6 +452,64 @@
         function updateProgress(text, percent) {
             document.getElementById('loadStatus').textContent = text;
             document.getElementById('progressFill').style.width = percent + '%';
+        }
+        
+        // Применение материалов после загрузки моделей
+        function applyMaterialsAfterLoad() {
+            // Для коммутатора принудительно применяем серый цвет
+            const switchModel = document.getElementById('switch-model');
+            if (switchModel) {
+                switchModel.setAttribute('material', 'color', '#888888');
+                switchModel.setAttribute('material', 'metalness', '0.4');
+                switchModel.setAttribute('material', 'roughness', '0.6');
+            }
+            
+            // Для других устройств также убедимся, что цвета применены
+            const routerModel = document.getElementById('router-model');
+            if (routerModel) {
+                routerModel.setAttribute('material', 'color', '#ffaa00');
+                routerModel.setAttribute('material', 'metalness', '0.3');
+                routerModel.setAttribute('material', 'roughness', '0.7');
+            }
+            
+            const pc1Model = document.getElementById('pc1-model');
+            if (pc1Model) {
+                pc1Model.setAttribute('material', 'color', '#0099ff');
+                pc1Model.setAttribute('material', 'metalness', '0.2');
+                pc1Model.setAttribute('material', 'roughness', '0.8');
+            }
+            
+            const pc2Model = document.getElementById('pc2-model');
+            if (pc2Model) {
+                pc2Model.setAttribute('material', 'color', '#ff4444');
+                pc2Model.setAttribute('material', 'metalness', '0.2');
+                pc2Model.setAttribute('material', 'roughness', '0.8');
+            }
+        }
+        
+        // Функция для создания резервных моделей
+        function createFallbackModels() {
+            // Резервный коммутатор (если OBJ не загрузится)
+            const switchModel = document.getElementById('switch-model');
+            
+            if (switchModel) {
+                switchModel.addEventListener('model-error', () => {
+                    // Создаем резервный box вместо OBJ модели
+                    const box = document.createElement('a-box');
+                    box.setAttribute('width', '0.3');
+                    box.setAttribute('height', '0.15');
+                    box.setAttribute('depth', '0.2');
+                    box.setAttribute('position', '0 0.075 0');
+                    box.setAttribute('color', '#888888');
+                    box.setAttribute('metalness', '0.4');
+                    box.setAttribute('roughness', '0.6');
+                    box.setAttribute('class', 'clickable');
+                    
+                    document.getElementById('switch').appendChild(box);
+                    console.log('Создан резервный коммутатор');
+                    onModelLoaded();
+                });
+            }
         }
         
         // Симуляция начальной загрузки
@@ -641,6 +750,9 @@
                     onModelLoaded();
                 });
             });
+            
+            // Создаем резервные модели на случай ошибок загрузки
+            createFallbackModels();
         });
     </script>
 </body>
