@@ -199,10 +199,11 @@
                 <a-entity id="router" position="0 0.15 -0.35">
                     <!-- 3D модель роутера -->
                     <a-entity 
-                        obj-model="obj: url(router.obj); mtl: url(router.mtl)"
+                        obj-model="obj: url(router.obj)"
                         position="0 0 0"
                         scale="0.15 0.15 0.15"
                         rotation="0 0 0"
+                        material="color: #ffaa00; metalness: 0.3; roughness: 0.7"
                         class="clickable"
                         data-info="Маршрутизатор&#10;Gi0/0.10: 192.168.10.1/24&#10;Gi0/0.20: 192.168.20.1/24&#10;Router-on-a-Stick конфигурация">
                     </a-entity>
@@ -220,10 +221,11 @@
                 <a-entity id="switch" position="0 0.15 0.05">
                     <!-- 3D модель коммутатора -->
                     <a-entity 
-                        obj-model="obj: url(switch.obj); mtl: url(switch.mtl)"
+                        obj-model="obj: url(switch.obj)"
                         position="0 0 0"
                         scale="0.2 0.2 0.2"
                         rotation="0 0 0"
+                        material="color: #666666; metalness: 0.4; roughness: 0.6"
                         class="clickable"
                         data-info="Коммутатор L2&#10;Port1: VLAN 10 (Access)&#10;Port2: VLAN 20 (Access)&#10;Port3: VLAN 10,20 (Trunk)">
                     </a-entity>
@@ -244,10 +246,11 @@
                 <a-entity id="pc1" position="-0.4 0.1 0.45">
                     <!-- 3D модель компьютера -->
                     <a-entity 
-                        obj-model="obj: url(computer.obj); mtl: url(computer.mtl)"
+                        obj-model="obj: url(computer.obj)"
                         position="0 0 0"
                         scale="0.12 0.12 0.12"
                         rotation="0 180 0"
+                        material="color: #0099ff; metalness: 0.2; roughness: 0.8"
                         class="clickable"
                         data-info="ПК1 - VLAN 10&#10;IP: 192.168.10.10/24&#10;MAC: AA:BB:CC:DD:EE:10&#10;Шлюз: 192.168.10.1">
                     </a-entity>
@@ -270,10 +273,11 @@
                 <a-entity id="pc2" position="0.4 0.1 0.45">
                     <!-- 3D модель компьютера -->
                     <a-entity 
-                        obj-model="obj: url(computer.obj); mtl: url(computer.mtl)"
+                        obj-model="obj: url(computer.obj)"
                         position="0 0 0"
                         scale="0.12 0.12 0.12"
                         rotation="0 180 0"
+                        material="color: #ff4444; metalness: 0.2; roughness: 0.8"
                         class="clickable"
                         data-info="ПК2 - VLAN 20&#10;IP: 192.168.20.20/24&#10;MAC: AA:BB:CC:DD:EE:20&#10;Шлюз: 192.168.20.1">
                     </a-entity>
@@ -365,7 +369,7 @@
             document.getElementById('progressFill').style.width = percent + '%';
         }
         
-        // Симуляция загрузки для демонстрации
+        // Симуляция начальной загрузки
         let loadProgress = 0;
         const loadInterval = setInterval(() => {
             loadProgress += Math.random() * 10;
