@@ -2,26 +2,17 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <title>AR Router-on-a-Stick Топология</title>
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
         body {
             margin: 0;
             padding: 0;
             overflow: hidden;
             background: #000;
             font-family: Arial, sans-serif;
-            width: 100vw;
-            height: 100vh;
-            position: fixed;
         }
         
         .help-btn {
@@ -141,20 +132,6 @@
             font-size: 12px;
             border: 1px solid #ff4444;
         }
-        
-        .legend {
-            position: absolute;
-            top: 60px;
-            left: 10px;
-            background: rgba(0,0,0,0.9);
-            color: white;
-            padding: 12px;
-            border-radius: 8px;
-            z-index: 1000;
-            max-width: 200px;
-            border: 2px solid #666666;
-            font-size: 11px;
-        }
     </style>
 </head>
 <body>
@@ -183,26 +160,6 @@
     <div class="vlan-info" id="vlanInfo">
         <h4 style="margin: 0 0 8px 0; color: #00ff88; font-size: 14px;">🏷️ VLAN Маршрутизация</h4>
         <div id="vlanDetails" style="font-size: 11px; line-height: 1.3;">Информация о меж VLAN передаче</div>
-    </div>
-
-    <div class="legend" id="legend">
-        <h4 style="margin: 0 0 8px 0; color: #00ff88; font-size: 14px;">📋 Легенда устройств</h4>
-        <div style="display: flex; align-items: center; margin: 5px 0;">
-            <div style="width: 12px; height: 12px; background: #ffaa00; border-radius: 2px; margin-right: 8px;"></div>
-            <span>Роутер (L3)</span>
-        </div>
-        <div style="display: flex; align-items: center; margin: 5px 0;">
-            <div style="width: 12px; height: 12px; background: #666666; border-radius: 2px; margin-right: 8px;"></div>
-            <span>Коммутатор (L2)</span>
-        </div>
-        <div style="display: flex; align-items: center; margin: 5px 0;">
-            <div style="width: 12px; height: 12px; background: #0099ff; border-radius: 2px; margin-right: 8px;"></div>
-            <span>ПК1 (VLAN 10)</span>
-        </div>
-        <div style="display: flex; align-items: center; margin: 5px 0;">
-            <div style="width: 12px; height: 12px; background: #ff4444; border-radius: 2px; margin-right: 8px;"></div>
-            <span>ПК2 (VLAN 20)</span>
-        </div>
     </div>
 
     <div class="controls" id="controls" style="display: none;">
@@ -240,11 +197,11 @@
                 
                 <!-- Уровень 1: Роутер (ближе к пользователю) -->
                 <a-entity id="router" position="0 0.1 -0.35">
-                    <!-- 3D модель роутера - УМЕНЬШЕНА В 1000 РАЗ ОТ ИСХОДНОГО РАЗМЕРА -->
+                    <!-- 3D модель роутера -->
                     <a-entity 
                         obj-model="obj: url(router.obj)"
                         position="0 0 0"
-                        scale="0.001 0.001 0.001"
+                        scale="0.1 0.1 0.1"
                         rotation="0 0 0"
                         material="color: #ffaa00; metalness: 0.3; roughness: 0.7"
                         class="clickable"
@@ -262,15 +219,15 @@
                 
                 <!-- Уровень 2: Коммутатор (дальше от пользователя) -->
                 <a-entity id="switch" position="0 0.1 0.05">
-                    <!-- 3D модель коммутатора - УВЕЛИЧЕНА В 2 РАЗА И СЕРЫЙ ЦВЕТ -->
+                    <!-- 3D модель коммутатора -->
                     <a-entity 
                         obj-model="obj: url(switch.obj)"
                         position="0 0 0"
-                        scale="0.0006 0.0006 0.0006"
+                        scale="0.15 0.15 0.15"
                         rotation="0 0 0"
                         material="color: #666666; metalness: 0.4; roughness: 0.6"
                         class="clickable"
-                        data-info="Коммутатор L2&#10;Port1: VLAN 10 (Access)&#10;Port2: VLAN 20 (Access)&#10;Port3: VLAN 10,20 (Trunk)&#10;Trunk порт подключен к роутеру">
+                        data-info="Коммутатор L2&#10;Port1: VLAN 10 (Access)&#10;Port2: VLAN 20 (Access)&#10;Port3: VLAN 10,20 (Trunk)">
                     </a-entity>
                     <a-entity 
                         text="value: SWITCH; color: white; align: center; width: 1.2"
