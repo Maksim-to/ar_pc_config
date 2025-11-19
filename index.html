@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-    <title>AR Визитная карточка</title>
+    <title>AR Визитка - СтанМашСтуд</title>
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
     <style>
@@ -25,7 +25,7 @@
             border-radius: 10px;
             z-index: 1000;
             max-width: 350px;
-            border: 2px solid #ff6b35;
+            border: 2px solid #2E86AB;
         }
         
         .loading {
@@ -42,26 +42,9 @@
             text-align: center;
         }
         
-        .marker-image {
-            position: absolute;
-            bottom: 10px;
-            right: 10px;
-            background: white;
-            padding: 12px;
-            border-radius: 8px;
-            max-width: 160px;
-            z-index: 1000;
-        }
-        
-        .marker-image img {
-            max-width: 100%;
-            height: auto;
-            border: 2px solid #333;
-        }
-        
         .ar-buttons {
             position: absolute;
-            bottom: 120px;
+            bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
             display: flex;
@@ -70,7 +53,7 @@
         }
         
         .ar-btn {
-            background: linear-gradient(45deg, #ff6b35, #ff8e53);
+            background: linear-gradient(45deg, #2E86AB, #A23B72);
             color: white;
             border: none;
             padding: 12px 20px;
@@ -78,13 +61,13 @@
             cursor: pointer;
             font-size: 14px;
             font-weight: bold;
-            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+            box-shadow: 0 4px 15px rgba(46, 134, 171, 0.3);
             transition: all 0.3s ease;
         }
         
         .ar-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4);
+            box-shadow: 0 6px 20px rgba(46, 134, 171, 0.4);
         }
         
         .ar-btn:active {
@@ -102,38 +85,56 @@
         
         .progress-fill {
             height: 100%;
-            background: #ff6b35;
+            background: #2E86AB;
             width: 0%;
             transition: width 0.3s;
+        }
+        
+        .hint {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(46, 134, 171, 0.9);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 20px;
+            z-index: 1000;
+            font-size: 12px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 0.7; }
+            50% { opacity: 1; }
+            100% { opacity: 0.7; }
         }
     </style>
 </head>
 <body>
     <div class="loading" id="loading">
-        <div>🔄 Загрузка AR-визитки...</div>
+        <div>⚙️ Загрузка AR-визитки...</div>
         <div class="progress-bar">
             <div class="progress-fill" id="progressFill"></div>
         </div>
-        <div style="font-size: 14px; margin-top: 10px;" id="loadStatus">Инициализация 3D контента...</div>
+        <div style="font-size: 14px; margin-top: 10px;" id="loadStatus">Инициализация промышленной AR сцены...</div>
     </div>
     
     <div class="instruction">
-        <h3>🚀 AR Визитная карточка</h3>
-        <p>• Наведите камеру на маркер справа</p>
-        <p>• Взаимодействуйте с 3D объектами</p>
-        <p>• Используйте кнопки для действий</p>
-        <div id="markerStatus" style="color: #ff4444; margin-top: 10px;">❌ Ожидание маркера...</div>
+        <h3>🏭 СтанМашСтуд</h3>
+        <p>• Наведите камеру на маркер визитки</p>
+        <p>• Изучите 3D модели оборудования</p>
+        <p>• Используйте кнопки для связи</p>
+        <div id="markerStatus" style="color: #ff4444; margin-top: 10px;">❌ Ожидание маркера визитки...</div>
+    </div>
+
+    <div class="hint" id="hint" style="display: none;">
+        📱 Наведите на визитку
     </div>
 
     <div class="ar-buttons" id="arButtons" style="display: none;">
         <button class="ar-btn" onclick="callPhone()">📞 Позвонить</button>
-        <button class="ar-btn" onclick="showPortfolio()">💼 Портфолио</button>
+        <button class="ar-btn" onclick="showPortfolio()">📊 Проекты</button>
         <button class="ar-btn" onclick="visitWebsite()">🌐 Сайт</button>
-    </div>
-
-    <div class="marker-image">
-        <p style="margin: 0 0 8px 0; font-weight: bold;">📱 AR Маркер:</p>
-        <img src="pc-marker.png" alt="AR Marker">
     </div>
 
     <a-scene 
@@ -159,75 +160,108 @@
             size="0.16"
             id="cardMarker">
             
-            <!-- Основная сцена -->
+            <!-- Основная сцена станкостроения -->
             <a-entity position="0 0.3 0" scale="0.8 0.8 0.8" rotation="0 0 0">
                 
-                <!-- 3D Логотип (вращающаяся сфера) -->
+                <!-- Вращающийся шпиндель станка -->
                 <a-entity 
-                    geometry="primitive: sphere; radius: 0.15"
-                    material="color: #ff6b35; shader: standard; metalness: 0.3; roughness: 0.2"
+                    geometry="primitive: cylinder; radius: 0.08; height: 0.3"
+                    material="color: #2E86AB; shader: standard; metalness: 0.8; roughness: 0.2"
                     position="0 0.4 0"
-                    animation="property: rotation; to: 0 360 0; loop: true; dur: 10000"
+                    animation="property: rotation; to: 360 0 0; loop: true; dur: 3000"
                     class="clickable"
-                    data-info="Логотип компании - инновационные решения в AR технологиях">
+                    data-info="Шпиндель ЧПУ станка - скорость до 24,000 об/мин, точность позиционирования 0.001мм">
                 </a-entity>
                 
-                <!-- Плавающие элементы портфолио -->
+                <!-- Деталь на станке -->
                 <a-entity 
-                    geometry="primitive: box; width: 0.1; height: 0.1; depth: 0.1"
-                    material="color: #4ECDC4; shader: standard"
-                    position="-0.3 0.3 0"
-                    animation="property: position; to: -0.3 0.5 0; loop: true; dir: alternate; dur: 2000"
+                    geometry="primitive: box; width: 0.15; height: 0.05; depth: 0.1"
+                    material="color: #F18F01; shader: standard"
+                    position="0 0.25 0.1"
+                    animation="property: position; to: 0.1 0.25 0.1; loop: true; dir: alternate; dur: 4000"
                     class="clickable"
-                    data-info="Проект №1: Разработка AR приложений">
+                    data-info="Обрабатываемая деталь - алюминиевый сплав, допуск ±0.01мм">
                 </a-entity>
                 
+                <!-- Режущий инструмент -->
                 <a-entity 
-                    geometry="primitive: cylinder; radius: 0.08; height: 0.15"
-                    material="color: #45B7D1; shader: standard"
-                    position="0.25 0.25 0"
-                    animation="property: rotation; to: 0 0 360; loop: true; dur: 8000"
+                    geometry="primitive: cone; radiusBottom: 0.03; radiusTop: 0.01; height: 0.15"
+                    material="color: #C73E1D; shader: standard; metalness: 0.9"
+                    position="0.2 0.35 0"
+                    animation="property: rotation; to: 0 180 0; loop: true; dir: alternate; dur: 5000"
                     class="clickable"
-                    data-info="Проект №2: 3D визуализация и моделирование">
+                    data-info="Фреза для чистовой обработки - твердый сплав, 4 зубья">
                 </a-entity>
                 
+                <!-- Система ЧПУ -->
                 <a-entity 
-                    geometry="primitive: cone; radiusBottom: 0.1; radiusTop: 0; height: 0.2"
-                    material="color: #96CEB4; shader: standard"
-                    position="0.2 0.6 0"
-                    animation="property: position; to: 0.4 0.6 0; loop: true; dir: alternate; dur: 3000"
+                    geometry="primitive: box; width: 0.2; height: 0.08; depth: 0.05"
+                    material="color: #333; shader: standard"
+                    position="-0.25 0.3 0"
                     class="clickable"
-                    data-info="Проект №3: Веб-разработка и дизайн">
+                    data-info="Система ЧПУ - 5-осевая обработка, поддержка G-кодов">
+                </a-entity>
+                
+                <!-- Логотип компании -->
+                <a-entity 
+                    geometry="primitive: torus; radius: 0.1; radiusTubular: 0.02"
+                    material="color: #A23B72; shader: standard"
+                    position="0 0.6 0"
+                    animation="property: rotation; to: 0 360 0; loop: true; dur: 8000"
+                    class="clickable"
+                    data-info="СтанМашСтуд - инновации в станкостроении с 2010 года">
                 </a-entity>
                 
                 <!-- Текстовые элементы -->
                 <a-entity 
-                    text="value: Иван Иванов; color: white; align: center; width: 1.5"
+                    text="value: СтанМашСтуд; color: #2E86AB; align: center; width: 2.5"
                     position="0 0.15 0"
-                    scale="0.8 0.8 0.8">
+                    scale="0.6 0.6 0.6">
                 </a-entity>
                 
                 <a-entity 
-                    text="value: AR/VR Разработчик; color: #ff6b35; align: center; width: 2"
-                    position="0 0.05 0"
-                    scale="0.5 0.5 0.5">
+                    text="value: Инжиниринг и производство; color: white; align: center; width: 3"
+                    position="0 0.08 0"
+                    scale="0.3 0.3 0.3">
                 </a-entity>
                 
-                <!-- Анимированные частицы -->
-                <a-entity id="particles">
-                    <a-entity geometry="primitive: sphere; radius: 0.02" material="color: #FFEAA7" 
-                             position="0.1 0.7 0" animation="property: position; to: 0.3 0.9 0; loop: true; dur: 4000"></a-entity>
-                    <a-entity geometry="primitive: sphere; radius: 0.02" material="color: #FFEAA7" 
-                             position="-0.2 0.8 0" animation="property: position; to: -0.4 0.6 0; loop: true; dur: 3500"></a-entity>
-                    <a-entity geometry="primitive: sphere; radius: 0.02" material="color: #FFEAA7" 
-                             position="0.15 0.5 0" animation="property: position; to: -0.15 0.7 0; loop: true; dur: 4500"></a-entity>
+                <a-entity 
+                    text="value: ЧПУ станки • Автоматизация • Робототехника; color: #F18F01; align: center; width: 4"
+                    position="0 0.02 0"
+                    scale="0.25 0.25 0.25">
+                </a-entity>
+                
+                <!-- Анимированные искры обработки -->
+                <a-entity id="sparks">
+                    <a-entity geometry="primitive: sphere; radius: 0.008" material="color: #FFEAA7" 
+                             position="0.15 0.3 0.05" animation="property: position; to: 0.18 0.35 0.08; loop: true; dur: 300"></a-entity>
+                    <a-entity geometry="primitive: sphere; radius: 0.006" material="color: #FFEAA7" 
+                             position="0.12 0.28 0.06" animation="property: position; to: 0.14 0.33 0.09; loop: true; dur: 400"></a-entity>
+                    <a-entity geometry="primitive: sphere; radius: 0.007" material="color: #FFEAA7" 
+                             position="0.14 0.29 0.04" animation="property: position; to: 0.16 0.34 0.07; loop: true; dur: 350"></a-entity>
+                </a-entity>
+                
+                <!-- Конвейерная лента -->
+                <a-entity 
+                    geometry="primitive: plane; width: 0.4; height: 0.05"
+                    material="color: #666; side: double"
+                    position="0 -0.1 0"
+                    rotation="-90 0 0">
+                </a-entity>
+                
+                <!-- Детали на конвейере -->
+                <a-entity 
+                    geometry="primitive: box; width: 0.06; height: 0.03; depth: 0.04"
+                    material="color: #F18F01"
+                    position="-0.15 -0.08 0"
+                    animation="property: position; to: 0.15 -0.08 0; loop: true; dur: 6000">
                 </a-entity>
                 
                 <!-- Освещение -->
                 <a-light type="ambient" color="#ffffff" intensity="0.6"></a-light>
                 <a-light type="directional" position="2 5 3" intensity="0.8" color="#ffffff"></a-light>
-                <a-light type="point" position="0 2 2" intensity="0.4" color="#ff6b35"></a-light>
-                <a-light type="point" position="-2 1 1" intensity="0.3" color="#4ECDC4"></a-light>
+                <a-light type="point" position="0 2 2" intensity="0.5" color="#2E86AB"></a-light>
+                <a-light type="point" position="1 1 1" intensity="0.3" color="#F18F01"></a-light>
                 
             </a-entity>
             
@@ -247,6 +281,7 @@
                 clearInterval(loadInterval);
                 setTimeout(() => {
                     document.getElementById('loading').style.display = 'none';
+                    document.getElementById('hint').style.display = 'block';
                 }, 500);
             }
             document.getElementById('progressFill').style.width = loadProgress + '%';
@@ -257,32 +292,33 @@
         const marker = document.getElementById('cardMarker');
         const statusDiv = document.getElementById('markerStatus');
         const buttonsDiv = document.getElementById('arButtons');
+        const hintDiv = document.getElementById('hint');
         
         marker.addEventListener('markerFound', () => {
-            statusDiv.innerHTML = '✅ Визитка активирована!';
+            statusDiv.innerHTML = '✅ Визитка распознана!';
             statusDiv.style.color = '#00ff00';
             buttonsDiv.style.display = 'flex';
+            hintDiv.style.display = 'none';
         });
         
         marker.addEventListener('markerLost', () => {
-            statusDiv.innerHTML = '❌ Ожидание маркера...';
+            statusDiv.innerHTML = '❌ Ожидание маркера визитки...';
             statusDiv.style.color = '#ff4444';
             buttonsDiv.style.display = 'none';
+            hintDiv.style.display = 'block';
         });
         
         // Функции для кнопок
         function callPhone() {
-            alert('📞 Имитация звонка: +7 (999) 123-45-67');
-            // В реальном приложении: window.location.href = 'tel:+79991234567';
+            alert('📞 СтанМашСтуд\nТел: +7 (495) 123-45-67\nОтдел продаж: доб. 101\nТехподдержка: доб. 102');
         }
         
         function showPortfolio() {
-            alert('💼 Открытие портфолио...\n\n• AR Архитектура ПК\n• Виртуальные выставки\n• Интерактивные презентации\n• 3D Визуализация');
+            alert('🏭 Наши проекты:\n\n• ЧПУ станки 5-осевые\n• Роботизированные линии\n• Автоматизация цехов\n• Системы контроля качества\n• Производство оснастки');
         }
         
         function visitWebsite() {
-            alert('🌐 Переход на сайт portfolio.ru');
-            // В реальном приложении: window.open('https://portfolio.ru', '_blank');
+            alert('🌐 Переход на сайт stanmashstud.ru\n\nКаталог оборудования →\nТехническая документация →\nОнлайн-запрос коммерческого предложения →');
         }
         
         // Обработка кликов по 3D объектам
@@ -291,7 +327,7 @@
             if (clickedEl && clickedEl.classList.contains('clickable')) {
                 const info = clickedEl.getAttribute('data-info');
                 if (info) {
-                    alert('💡 ' + info);
+                    alert('⚙️ ' + info);
                 }
                 
                 // Анимация при клике
@@ -314,12 +350,12 @@
             }
         });
         
-        // Авто-скрытие инструкций через 20 секунд
+        // Авто-скрытие инструкций через 25 секунд
         setTimeout(() => {
             const instruction = document.querySelector('.instruction');
             instruction.style.opacity = '0.7';
             instruction.style.transition = 'opacity 3s';
-        }, 20000);
+        }, 25000);
     </script>
 </body>
 </html>
