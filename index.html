@@ -231,11 +231,11 @@
                 
                 <!-- Уровень 1: Роутер (ближе к пользователю) -->
                 <a-entity id="router" position="0 0.1 -0.35">
-                    <!-- 3D модель роутера - УМЕНЬШЕНА В 1000 РАЗ ОТ ИСХОДНОГО РАЗМЕРА -->
+                    <!-- 3D модель роутера - УМЕНЬШЕНА В 1000 РАЗ -->
                     <a-entity 
                         obj-model="obj: url(router.obj)"
                         position="0 0 0"
-                        scale="0.001 0.001 0.001"
+                        scale="0.000001 0.000001 0.000001" <!-- Уменьшено в 1000 раз от 0.001 -->
                         rotation="0 0 0"
                         material="color: #ffaa00; metalness: 0.3; roughness: 0.7"
                         class="clickable"
@@ -253,13 +253,13 @@
                 
                 <!-- Уровень 2: Коммутатор (дальше от пользователя) -->
                 <a-entity id="switch" position="0 0.1 0.05">
-                    <!-- 3D модель коммутатора - УВЕЛИЧЕНА В 2 РАЗА И СЕРЫЙ ЦВЕТ -->
+                    <!-- 3D модель коммутатора - УМЕНЬШЕНА В 250 РАЗ -->
                     <a-entity 
                         obj-model="obj: url(switch.obj)"
                         position="0 0 0"
-                        scale="0.0006 0.0006 0.0006" <!-- Изменено с 0.0003 на 0.0006 (увеличение в 2 раза) -->
+                        scale="0.0000024 0.0000024 0.0000024" <!-- Уменьшено в 250 раз от 0.0006 -->
                         rotation="0 0 0"
-                        material="color: #888888; metalness: 0.4; roughness: 0.6" <!-- Изменен цвет на серый -->
+                        material="color: #888888; metalness: 0.4; roughness: 0.6"
                         class="clickable"
                         data-info="Коммутатор L2&#10;Port1: VLAN 10 (Access)&#10;Port2: VLAN 20 (Access)&#10;Port3: VLAN 10,20 (Trunk)">
                     </a-entity>
@@ -330,8 +330,8 @@
                     <a-entity geometry="primitive: sphere; radius: 0.012; material: color: #ff4444" position="0 0.08 -0.05"></a-entity>
                 </a-entity>
                 
-                <!-- Сетевые соединения (правильно подключенные к портам) -->
-                <!-- Роутер -> Коммутатор (Trunk, увеличенная длина) -->
+                <!-- Сетевые соединения -->
+                <!-- Роутер -> Коммутатор (Trunk) -->
                 <a-entity line="start: 0 0.1 -0.29; end: 0 0.1 -0.005; color: #00ff88; opacity: 0.8" id="lineRouterSwitch"></a-entity>
                 
                 <!-- Коммутатор -> ПК1 (VLAN 10) -->
@@ -340,7 +340,7 @@
                 <!-- Коммутатор -> ПК2 (VLAN 20) -->
                 <a-entity line="start: 0.1 0.1 0.005; end: 0.35 0.1 0.425; color: #ff4444; opacity: 0.8" id="lineSwitchPc2"></a-entity>
                 
-                <!-- Анимированные пакеты (точки вдоль кабелей) -->
+                <!-- Анимированные пакеты -->
                 <a-entity id="packetContainer">
                     <!-- Пакеты будут создаваться динамически -->
                 </a-entity>
