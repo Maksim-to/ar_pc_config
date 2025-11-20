@@ -395,9 +395,6 @@
                         position="0 -0.15 0"
                         scale="0.25 0.25 0.25">
                     </a-entity>
-                    
-                    <!-- Порты роутера -->
-                    <a-entity geometry="primitive: sphere; radius: 0.015" material="color: #00ff88" position="0 0.08 -0.06"></a-entity>
                 </a-entity>
                 
                 <!-- Уровень 2: Коммутатор (дальше от пользователя) -->
@@ -417,11 +414,6 @@
                         position="0 -0.2 0"
                         scale="0.25 0.25 0.25">
                     </a-entity>
-                    
-                    <!-- Порты коммутатора -->
-                    <a-entity geometry="primitive: sphere; radius: 0.015" material="color: #0099ff" position="-0.1 0.08 0.05"></a-entity>
-                    <a-entity geometry="primitive: sphere; radius: 0.015" material="color: #ff4444" position="0.1 0.08 0.05"></a-entity>
-                    <a-entity geometry="primitive: sphere; radius: 0.015" material="color: #00ff88" position="0 0.08 -0.05"></a-entity>
                 </a-entity>
                 
                 <!-- Уровень 3: Компьютеры (самые дальние от пользователя) -->
@@ -447,9 +439,6 @@
                         position="0 -0.22 0"
                         scale="0.15 0.15 0.15">
                     </a-entity>
-                    
-                    <!-- Порты ПК1 -->
-                    <a-entity geometry="primitive: sphere; radius: 0.012" material="color: #0099ff" position="0 0.08 -0.05"></a-entity>
                 </a-entity>
                 
                 <!-- ПК2 (VLAN 20) -->
@@ -474,9 +463,6 @@
                         position="0 -0.22 0"
                         scale="0.15 0.15 0.15">
                     </a-entity>
-                    
-                    <!-- Порты ПК2 -->
-                    <a-entity geometry="primitive: sphere; radius: 0.012" material="color: #ff4444" position="0 0.08 -0.05"></a-entity>
                 </a-entity>
                 
                 <!-- Сетевые соединения (правильно подключенные к портам) -->
@@ -489,7 +475,7 @@
                 <!-- Коммутатор -> ПК2 (VLAN 20) -->
                 <a-entity line="start: 0.1 0.1 0.005; end: 0.35 0.1 0.425; color: #ff4444; opacity: 0.8" id="lineSwitchPc2"></a-entity>
                 
-                <!-- Анимированные пакеты (точки вдоль кабелей) -->
+                <!-- Анимированные пакеты (конверты вдоль кабелей) -->
                 <a-entity id="packetContainer">
                     <!-- Пакеты будут создаваться динамически -->
                 </a-entity>
@@ -718,7 +704,7 @@
             currentPacket = null;
         }
         
-        // Улучшенная функция создания анимированного пакета
+        // Улучшенная функция создания анимированного пакета в виде конверта
         function createVlanPacket() {
             if (!isTransmissionActive) return;
             
@@ -736,23 +722,27 @@
             const sourcePC = isVlan10to20 ? 'ПК1' : 'ПК2';
             const destPC = isVlan10to20 ? 'ПК2' : 'ПК1';
             
-            // Создание пакета (точка)
+            // Создание пакета в виде конверта (плоский прямоугольник)
             const packet = document.createElement('a-entity');
             packet.setAttribute('id', packetId);
-            packet.setAttribute('geometry', 'primitive: sphere; radius: 0.012');
-            packet.setAttribute('material', `color: ${sourceColor}; shader: standard; emissive: ${sourceColor}; emissiveIntensity: 0.8`);
+            
+            // Создаем конверт - плоский прямоугольник с закругленными краями
+            packet.setAttribute('geometry', 'primitive: plane; width: 0.05; height: 0.03');
+            packet.setAttribute('material', `color: ${sourceColor}; shader: flat; side: double; transparent: true; opacity: 0.9`);
+            
+            // Добавляем текстуру конверта (символ)
+            const envelopeSymbol = document.createElement('a-entity');
+            envelopeSymbol.setAttribute('text', `value: ✉️; color: white; align: center; width: 0.8`);
+            envelopeSymbol.setAttribute('position', '0 0 0.001');
+            envelopeSymbol.setAttribute('scale', '0.8 0.8 0.8');
+            packet.appendChild(envelopeSymbol);
             
             // Начальная позиция - от порта ПК
             const startPos = isVlan10to20 ? '-0.35 0.1 0.425' : '0.35 0.1 0.425';
             packet.setAttribute('position', startPos);
             
-            // Добавляем свечение к пакету
-            const light = document.createElement('a-light');
-            light.setAttribute('type', 'point');
-            light.setAttribute('color', sourceColor);
-            light.setAttribute('intensity', '0.5');
-            light.setAttribute('distance', '0.2');
-            packet.appendChild(light);
+            // Поворачиваем конверт лицом к камере
+            packet.setAttribute('rotation', '0 0 0');
             
             document.getElementById('packetContainer').appendChild(packet);
             currentPacket = packet;
@@ -771,6 +761,16 @@
                 from: startPos,
                 to: switchPos,
                 dur: 2000,
+                easing: 'easeInOutQuad'
+            });
+            
+            // Добавляем небольшую анимацию "покачивания" конверта
+            packet.setAttribute('animation__bob', {
+                property: 'position',
+                to: `${switchPos.split(' ')[0]} ${parseFloat(switchPos.split(' ')[1]) + 0.02} ${switchPos.split(' ')[2]}`,
+                dur: 1000,
+                dir: 'alternate',
+                loop: true,
                 startEvents: 'start'
             });
             
@@ -781,7 +781,8 @@
                     property: 'position',
                     from: switchPos,
                     to: '0 0.1 -0.29',
-                    dur: 2000
+                    dur: 2000,
+                    easing: 'easeInOutQuad'
                 });
                 updateVlanInfo(
                     '🔄 SWITCH → ROUTER',
@@ -792,17 +793,28 @@
             // Этап 3: Роутер (меж VLAN маршрутизация)
             setTimeout(() => {
                 if (!isTransmissionActive) return;
-                // Меняем цвет пакета при маршрутизации
-                packet.setAttribute('material', `color: #00ff88; emissive: #00ff88`);
-                light.setAttribute('color', '#00ff88');
+                // Меняем цвет конверта при маршрутизации
+                packet.setAttribute('material', `color: #00ff88;`);
                 
-                // Анимация "обработки" в роутере (небольшое движение вглубь)
+                // Анимация "обработки" в роутере (небольшое движение вглубь и обратно)
                 packet.setAttribute('animation', {
                     property: 'position',
                     from: '0 0.1 -0.29',
                     to: '0 0.1 -0.32',
-                    dur: 1000
+                    dur: 1000,
+                    dir: 'alternate',
+                    loop: 2
                 });
+                
+                // Анимация изменения размера для эффекта "обработки"
+                packet.setAttribute('animation__scale', {
+                    property: 'scale',
+                    to: '1.2 1.2 1.2',
+                    dur: 500,
+                    dir: 'alternate',
+                    loop: 2
+                });
+                
                 updateVlanInfo(
                     '🏷️ Меж VLAN Маршрутизация',
                     `Пакет #${packetSequence}<br>Сабинтерфейс: Gi0/0.${sourceVlan}<br>Смена VLAN Tag: ${sourceVlan} → ${destVlan}`
@@ -812,15 +824,18 @@
             // Этап 4: Роутер -> Коммутатор (обратно по trunk)
             setTimeout(() => {
                 if (!isTransmissionActive) return;
-                // Меняем цвет пакета на цвет VLAN назначения
-                packet.setAttribute('material', `color: ${destColor}; emissive: ${destColor}`);
-                light.setAttribute('color', destColor);
+                // Меняем цвет конверта на цвет VLAN назначения
+                packet.setAttribute('material', `color: ${destColor}`);
+                
+                // Сбрасываем масштаб
+                packet.setAttribute('scale', '1 1 1');
                 
                 packet.setAttribute('animation', {
                     property: 'position',
-                    from: '0 0.1 -0.32',
+                    from: '0 0.1 -0.29',
                     to: '0 0.1 -0.005',
-                    dur: 1800
+                    dur: 1800,
+                    easing: 'easeInOutQuad'
                 });
                 updateVlanInfo(
                     '🔄 ROUTER → SWITCH',
@@ -838,7 +853,8 @@
                     property: 'position',
                     from: '0 0.1 -0.005',
                     to: destSwitchPos,
-                    dur: 1500
+                    dur: 1500,
+                    easing: 'easeInOutQuad'
                 });
                 
                 // Этап 6: Финальный отрезок к получателю
@@ -848,7 +864,8 @@
                         property: 'position',
                         from: destSwitchPos,
                         to: destPos,
-                        dur: 1800
+                        dur: 1800,
+                        easing: 'easeInOutQuad'
                     });
                     updateVlanInfo(
                         `📥 Доставка ${destPC}`,
@@ -864,6 +881,14 @@
                             property: 'scale',
                             from: '1 1 1',
                             to: '0.1 0.1 0.1',
+                            dur: 500
+                        });
+                        
+                        // Эффект исчезновения
+                        packet.setAttribute('animation__fade', {
+                            property: 'material.opacity',
+                            from: '0.9',
+                            to: '0',
                             dur: 500
                         });
                         
