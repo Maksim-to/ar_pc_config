@@ -722,27 +722,27 @@
             const sourcePC = isVlan10to20 ? 'ПК1' : 'ПК2';
             const destPC = isVlan10to20 ? 'ПК2' : 'ПК1';
             
-            // Создание пакета в виде конверта (плоский прямоугольник)
+            // Создание пакета в виде конверта (вертикальный прямоугольник)
             const packet = document.createElement('a-entity');
             packet.setAttribute('id', packetId);
             
-            // Создаем конверт - плоский прямоугольник с закругленными краями
-            packet.setAttribute('geometry', 'primitive: plane; width: 0.05; height: 0.03');
+            // Создаем конверт - вертикальный прямоугольник с правильной ориентацией
+            // Поворачиваем на 90 градусов вокруг оси X, чтобы плоскость стала вертикальной
+            packet.setAttribute('geometry', 'primitive: plane; width: 0.03; height: 0.05');
             packet.setAttribute('material', `color: ${sourceColor}; shader: flat; side: double; transparent: true; opacity: 0.9`);
+            packet.setAttribute('rotation', '-90 0 0'); // Поворачиваем, чтобы конверт был вертикальным
             
             // Добавляем текстуру конверта (символ)
             const envelopeSymbol = document.createElement('a-entity');
             envelopeSymbol.setAttribute('text', `value: ✉️; color: white; align: center; width: 0.8`);
             envelopeSymbol.setAttribute('position', '0 0 0.001');
             envelopeSymbol.setAttribute('scale', '0.8 0.8 0.8');
+            envelopeSymbol.setAttribute('rotation', '90 0 0'); // Компенсируем поворот родителя
             packet.appendChild(envelopeSymbol);
             
             // Начальная позиция - от порта ПК
             const startPos = isVlan10to20 ? '-0.35 0.1 0.425' : '0.35 0.1 0.425';
             packet.setAttribute('position', startPos);
-            
-            // Поворачиваем конверт лицом к камере
-            packet.setAttribute('rotation', '0 0 0');
             
             document.getElementById('packetContainer').appendChild(packet);
             currentPacket = packet;
