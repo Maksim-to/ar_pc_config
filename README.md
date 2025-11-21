@@ -94,8 +94,9 @@ Android Chrome 60+
 Современные desktop браузеры с поддержкой WebGL
 
 🔧 Сетевые настройки
+
 Конфигурация коммутатора:
-text
+
 interface Gi0/1
  switchport mode access
  switchport access vlan 10
@@ -107,8 +108,9 @@ interface Gi0/2
 interface Gi0/3
  switchport mode trunk
  switchport trunk allowed vlan 10,20
+
 Конфигурация роутера:
-text
+
 interface Gi0/0.10
  encapsulation dot1Q 10
  ip address 192.168.10.1 255.255.255.0
