@@ -1,11 +1,8 @@
 AR Router-on-a-Stick Топология
 Дополненная реальность для демонстрации меж-VLAN маршрутизации по технологии Router-on-a-Stick.
 
-https://img.shields.io/badge/AR-Network%2520Topology-blue
-https://img.shields.io/badge/WebXR-Enabled-green
-
 🚀 Быстрый старт
-Откройте проект: https://ваш-никнейм.github.io/ar-router-on-a-stick/
+Откройте проект: https://maksim-to.github.io/ar_pc_config/
 
 Разрешите доступ к камере
 
