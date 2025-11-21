@@ -438,13 +438,21 @@
                         scale="0.001 0.001 0.001"
                         rotation="90 0 0"
                         class="clickable"
-                        data-device="router">
+                        data-device="router"
+                        event-set__mouseenter="scale: 1.05 1.05 1.05"
+                        event-set__mouseleave="scale: 1 1 1">
                     </a-entity>
                     <a-entity 
                         text="value: ROUTER; color: white; align: center; width: 1.0"
                         position="0 -0.15 0"
                         scale="0.25 0.25 0.25">
                     </a-entity>
+                    
+                    <!-- Невидимый коллайдер для кликов -->
+                    <a-box position="0 0.08 0" width="0.4" height="0.3" depth="0.3" 
+                           material="visible: false; transparent: true; opacity: 0"
+                           class="clickable" data-device="router">
+                    </a-box>
                 </a-entity>
                 
                 <!-- Уровень 2: Коммутатор (дальше от пользователя) -->
@@ -457,13 +465,21 @@
                         scale="0.0006 0.0006 0.0006"
                         rotation="0 0 0"
                         class="clickable"
-                        data-device="switch">
+                        data-device="switch"
+                        event-set__mouseenter="scale: 1.05 1.05 1.05"
+                        event-set__mouseleave="scale: 1 1 1">
                     </a-entity>
                     <a-entity 
                         text="value: SWITCH; color: white; align: center; width: 1.2"
                         position="0 -0.2 0"
                         scale="0.25 0.25 0.25">
                     </a-entity>
+                    
+                    <!-- Невидимый коллайдер для кликов -->
+                    <a-box position="0 0.08 0" width="0.4" height="0.3" depth="0.3" 
+                           material="visible: false; transparent: true; opacity: 0"
+                           class="clickable" data-device="switch">
+                    </a-box>
                 </a-entity>
                 
                 <!-- Уровень 3: Компьютеры (самые дальние от пользователя) -->
@@ -477,7 +493,9 @@
                         scale="0.12 0.12 0.12"
                         rotation="0 180 0"
                         class="clickable"
-                        data-device="pc1">
+                        data-device="pc1"
+                        event-set__mouseenter="scale: 1.05 1.05 1.05"
+                        event-set__mouseleave="scale: 1 1 1">
                     </a-entity>
                     <a-entity 
                         text="value: ПК1; color: white; align: center; width: 0.8"
@@ -489,6 +507,12 @@
                         position="0 -0.22 0"
                         scale="0.15 0.15 0.15">
                     </a-entity>
+                    
+                    <!-- Невидимый коллайдер для кликов -->
+                    <a-box position="0 0.08 0" width="0.3" height="0.25" depth="0.25" 
+                           material="visible: false; transparent: true; opacity: 0"
+                           class="clickable" data-device="pc1">
+                    </a-box>
                 </a-entity>
                 
                 <!-- ПК2 (VLAN 20) -->
@@ -501,7 +525,9 @@
                         scale="0.12 0.12 0.12"
                         rotation="0 180 0"
                         class="clickable"
-                        data-device="pc2">
+                        data-device="pc2"
+                        event-set__mouseenter="scale: 1.05 1.05 1.05"
+                        event-set__mouseleave="scale: 1 1 1">
                     </a-entity>
                     <a-entity 
                         text="value: ПК2; color: white; align: center; width: 0.8"
@@ -513,6 +539,12 @@
                         position="0 -0.22 0"
                         scale="0.15 0.15 0.15">
                     </a-entity>
+                    
+                    <!-- Невидимый коллайдер для кликов -->
+                    <a-box position="0 0.08 0" width="0.3" height="0.25" depth="0.25" 
+                           material="visible: false; transparent: true; opacity: 0"
+                           class="clickable" data-device="pc2">
+                    </a-box>
                 </a-entity>
                 
                 <!-- Сетевые соединения (правильно подключенные к портам) -->
@@ -555,7 +587,18 @@
             
         </a-marker>
         
-        <a-entity camera></a-entity>
+        <!-- Камера с курсором для обработки кликов -->
+        <a-entity camera look-controls>
+            <a-cursor 
+                id="cursor"
+                animation__click="property: scale; startEvents: click; from: 0.1 0.1 0.1; to: 1 1 1; dur: 150"
+                fuse="true"
+                fuse-timeout="50"
+                raycaster="objects: .clickable"
+                material="color: #00ff88; shader: flat; opacity: 0.5"
+                geometry="primitive: ring; radiusInner: 0.008; radiusOuter: 0.01">
+            </a-cursor>
+        </a-entity>
         
     </a-scene>
 
