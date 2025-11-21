@@ -412,7 +412,8 @@
         "
         renderer="colorManagement: true; antialias: true;"
         vr-mode-ui="enabled: false"
-        loading-screen="enabled:false">
+        loading-screen="enabled:false"
+        cursor="rayOrigin: mouse">
         
         <!-- Маркер для сетевой визуализации -->
         <a-marker 
@@ -439,13 +440,20 @@
                         rotation="90 0 0"
                         class="clickable"
                         data-device="router"
-                        data-info="Маршрутизатор&#10;Gi0/0.10: 192.168.10.1/24&#10;Gi0/0.20: 192.168.20.1/24&#10;Router-on-a-Stick конфигурация">
+                        event-set__mouseenter="scale: 1.1 1.1 1.1"
+                        event-set__mouseleave="scale: 1 1 1">
                     </a-entity>
                     <a-entity 
                         text="value: ROUTER; color: white; align: center; width: 1.0"
                         position="0 -0.15 0"
                         scale="0.25 0.25 0.25">
                     </a-entity>
+                    
+                    <!-- Невидимый коллайдер для лучшего клика -->
+                    <a-box position="0 0.08 0" width="0.4" height="0.3" depth="0.3" 
+                           material="visible: false; transparent: true; opacity: 0"
+                           class="clickable" data-device="router">
+                    </a-box>
                 </a-entity>
                 
                 <!-- Уровень 2: Коммутатор (дальше от пользователя) -->
@@ -459,13 +467,20 @@
                         rotation="0 0 0"
                         class="clickable"
                         data-device="switch"
-                        data-info="Коммутатор L2&#10;Port1: VLAN 10 (Access)&#10;Port2: VLAN 20 (Access)&#10;Port3: VLAN 10,20 (Trunk)">
+                        event-set__mouseenter="scale: 1.1 1.1 1.1"
+                        event-set__mouseleave="scale: 1 1 1">
                     </a-entity>
                     <a-entity 
                         text="value: SWITCH; color: white; align: center; width: 1.2"
                         position="0 -0.2 0"
                         scale="0.25 0.25 0.25">
                     </a-entity>
+                    
+                    <!-- Невидимый коллайдер для лучшего клика -->
+                    <a-box position="0 0.08 0" width="0.4" height="0.3" depth="0.3" 
+                           material="visible: false; transparent: true; opacity: 0"
+                           class="clickable" data-device="switch">
+                    </a-box>
                 </a-entity>
                 
                 <!-- Уровень 3: Компьютеры (самые дальние от пользователя) -->
@@ -480,7 +495,8 @@
                         rotation="0 180 0"
                         class="clickable"
                         data-device="pc1"
-                        data-info="ПК1 - VLAN 10&#10;IP: 192.168.10.10/24&#10;MAC: AA:BB:CC:DD:EE:10&#10;Шлюз: 192.168.10.1">
+                        event-set__mouseenter="scale: 1.1 1.1 1.1"
+                        event-set__mouseleave="scale: 1 1 1">
                     </a-entity>
                     <a-entity 
                         text="value: ПК1; color: white; align: center; width: 0.8"
@@ -492,6 +508,12 @@
                         position="0 -0.22 0"
                         scale="0.15 0.15 0.15">
                     </a-entity>
+                    
+                    <!-- Невидимый коллайдер для лучшего клика -->
+                    <a-box position="0 0.08 0" width="0.3" height="0.25" depth="0.25" 
+                           material="visible: false; transparent: true; opacity: 0"
+                           class="clickable" data-device="pc1">
+                    </a-box>
                 </a-entity>
                 
                 <!-- ПК2 (VLAN 20) -->
@@ -505,7 +527,8 @@
                         rotation="0 180 0"
                         class="clickable"
                         data-device="pc2"
-                        data-info="ПК2 - VLAN 20&#10;IP: 192.168.20.20/24&#10;MAC: AA:BB:CC:DD:EE:20&#10;Шлюз: 192.168.20.1">
+                        event-set__mouseenter="scale: 1.1 1.1 1.1"
+                        event-set__mouseleave="scale: 1 1 1">
                     </a-entity>
                     <a-entity 
                         text="value: ПК2; color: white; align: center; width: 0.8"
@@ -517,6 +540,12 @@
                         position="0 -0.22 0"
                         scale="0.15 0.15 0.15">
                     </a-entity>
+                    
+                    <!-- Невидимый коллайдер для лучшего клика -->
+                    <a-box position="0 0.08 0" width="0.3" height="0.25" depth="0.25" 
+                           material="visible: false; transparent: true; opacity: 0"
+                           class="clickable" data-device="pc2">
+                    </a-box>
                 </a-entity>
                 
                 <!-- Сетевые соединения (правильно подключенные к портам) -->
@@ -559,7 +588,16 @@
             
         </a-marker>
         
-        <a-entity camera></a-entity>
+        <!-- Камера с курсором для обработки кликов -->
+        <a-entity camera look-controls>
+            <a-cursor 
+                id="cursor"
+                animation__click="property: scale; startEvents: click; from: 0.1 0.1 0.1; to: 1 1 1; dur: 150"
+                fuse="true"
+                fuse-timeout="50"
+                raycaster="objects: .clickable">
+            </a-cursor>
+        </a-entity>
         
     </a-scene>
 
@@ -791,6 +829,7 @@
                     box.setAttribute('metalness', '0.4');
                     box.setAttribute('roughness', '0.6');
                     box.setAttribute('class', 'clickable');
+                    box.setAttribute('data-device', 'switch');
                     
                     document.getElementById('switch').appendChild(box);
                     console.log('Создан резервный коммутатор');
@@ -882,7 +921,6 @@
             packet.setAttribute('id', packetId);
             
             // Создаем конверт - вертикальный прямоугольник с правильной ориентацией
-            // Поворачиваем на 90 градусов вокруг оси X, чтобы плоскость стала вертикальной
             packet.setAttribute('geometry', 'primitive: plane; width: 0.03; height: 0.05');
             packet.setAttribute('material', `color: ${sourceColor}; shader: flat; side: double; transparent: true; opacity: 0.9`);
             packet.setAttribute('rotation', '-90 0 0'); // Поворачиваем, чтобы конверт был вертикальным
@@ -1091,15 +1129,18 @@
                   'interface Gi0/0.20\n encapsulation dot1Q 20\n ip address 192.168.20.1 255.255.255.0');
         }
         
-        // Обработка кликов по сетевым устройствам
-        document.querySelector('a-scene').addEventListener('click', function(evt) {
-            const clickedEl = evt.detail.intersection?.object.el;
-            if (clickedEl && clickedEl.classList.contains('clickable')) {
-                const deviceType = clickedEl.getAttribute('data-device');
-                if (deviceType) {
-                    showDeviceTooltip(deviceType);
+        // Обработка кликов по сетевым устройствам через события A-Frame
+        document.addEventListener('DOMContentLoaded', function() {
+            // Обработчик для кликов по устройствам
+            document.querySelector('a-scene').addEventListener('click', function(evt) {
+                const clickedEl = evt.detail.intersection?.object.el;
+                if (clickedEl && clickedEl.classList.contains('clickable')) {
+                    const deviceType = clickedEl.getAttribute('data-device');
+                    if (deviceType) {
+                        showDeviceTooltip(deviceType);
+                    }
                 }
-            }
+            });
         });
         
         // Отслеживание загрузки моделей после загрузки сцены
