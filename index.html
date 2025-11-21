@@ -48,6 +48,21 @@
             display: none;
         }
         
+        .device-tooltip {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.95);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            z-index: 10000;
+            max-width: 300px;
+            border: 2px solid #0099ff;
+            display: none;
+        }
+        
         .close-btn {
             position: absolute;
             top: 8px;
@@ -205,7 +220,7 @@
         }
 
         /* Убедимся, что все наши элементы видны поверх AR.js */
-        .help-btn, .instruction, .loading, .controls, .vlan-info, .marker-status {
+        .help-btn, .instruction, .loading, .controls, .vlan-info, .marker-status, .device-tooltip {
             z-index: 10000 !important;
         }
         
@@ -220,6 +235,11 @@
                 width: 300px;
                 right: auto;
                 margin: 0;
+            }
+            
+            .device-tooltip {
+                max-width: 90%;
+                width: 300px;
             }
             
             .help-btn {
@@ -246,7 +266,7 @@
         }
 
         /* Убедитесь, что все элементы интерфейса имеют правильный цвет текста */
-        .instruction, .vlan-info, .marker-status, .loading {
+        .instruction, .vlan-info, .marker-status, .loading, .device-tooltip {
             color: white !important;
             text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
         }
@@ -279,6 +299,25 @@
             z-index: 999;
             display: none;
         }
+        
+        .device-info-line {
+            margin: 5px 0;
+            font-size: 11px;
+            line-height: 1.3;
+        }
+        
+        .device-info-title {
+            color: #00ff88;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        
+        .device-info-section {
+            margin: 10px 0;
+            padding: 8px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 5px;
+        }
     </style>
 </head>
 <body>
@@ -294,6 +333,9 @@
     
     <!-- Оверлей для закрытия по клику вне подсказки -->
     <div class="overlay" id="overlay" onclick="toggleHelp()"></div>
+    
+    <!-- Оверлей для закрытия по клику вне подсказки устройства -->
+    <div class="overlay" id="deviceOverlay" onclick="hideDeviceTooltip()"></div>
     
     <div class="instruction" id="instruction">
         <button class="close-btn" onclick="toggleHelp()">×</button>
@@ -333,6 +375,14 @@
                 <div class="legend-color" style="background: #00ff88;"></div>
                 <div class="legend-text">Trunk соединение</div>
             </div>
+        </div>
+    </div>
+
+    <!-- Интерактивная подсказка для устройств -->
+    <div class="device-tooltip" id="deviceTooltip">
+        <button class="close-btn" onclick="hideDeviceTooltip()">×</button>
+        <div id="deviceTooltipContent">
+            <!-- Контент будет заполняться динамически -->
         </div>
     </div>
 
@@ -388,6 +438,7 @@
                         scale="0.001 0.001 0.001"
                         rotation="90 0 0"
                         class="clickable"
+                        data-device="router"
                         data-info="Маршрутизатор&#10;Gi0/0.10: 192.168.10.1/24&#10;Gi0/0.20: 192.168.20.1/24&#10;Router-on-a-Stick конфигурация">
                     </a-entity>
                     <a-entity 
@@ -407,6 +458,7 @@
                         scale="0.0006 0.0006 0.0006"
                         rotation="0 0 0"
                         class="clickable"
+                        data-device="switch"
                         data-info="Коммутатор L2&#10;Port1: VLAN 10 (Access)&#10;Port2: VLAN 20 (Access)&#10;Port3: VLAN 10,20 (Trunk)">
                     </a-entity>
                     <a-entity 
@@ -427,6 +479,7 @@
                         scale="0.12 0.12 0.12"
                         rotation="0 180 0"
                         class="clickable"
+                        data-device="pc1"
                         data-info="ПК1 - VLAN 10&#10;IP: 192.168.10.10/24&#10;MAC: AA:BB:CC:DD:EE:10&#10;Шлюз: 192.168.10.1">
                     </a-entity>
                     <a-entity 
@@ -451,6 +504,7 @@
                         scale="0.12 0.12 0.12"
                         rotation="0 180 0"
                         class="clickable"
+                        data-device="pc2"
                         data-info="ПК2 - VLAN 20&#10;IP: 192.168.20.20/24&#10;MAC: AA:BB:CC:DD:EE:20&#10;Шлюз: 192.168.20.1">
                     </a-entity>
                     <a-entity 
@@ -551,14 +605,115 @@
             }
         }
         
+        // Функция показа подсказки устройства
+        function showDeviceTooltip(deviceType) {
+            const tooltip = document.getElementById('deviceTooltip');
+            const overlay = document.getElementById('deviceOverlay');
+            const content = document.getElementById('deviceTooltipContent');
+            
+            let tooltipContent = '';
+            
+            switch(deviceType) {
+                case 'router':
+                    tooltipContent = `
+                        <div class="device-info-title">🚦 Маршрутизатор (L3)</div>
+                        <div class="device-info-section">
+                            <div class="device-info-line"><strong>Сабинтерфейсы:</strong></div>
+                            <div class="device-info-line">• Gi0/0.10: 192.168.10.1/24 (VLAN 10)</div>
+                            <div class="device-info-line">• Gi0/0.20: 192.168.20.1/24 (VLAN 20)</div>
+                        </div>
+                        <div class="device-info-section">
+                            <div class="device-info-line"><strong>Функции:</strong></div>
+                            <div class="device-info-line">• Меж-VLAN маршрутизация</div>
+                            <div class="device-info-line">• Router-on-a-Stick конфигурация</div>
+                            <div class="device-info-line">• DHCP сервер для VLAN</div>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'switch':
+                    tooltipContent = `
+                        <div class="device-info-title">🔀 Коммутатор L2</div>
+                        <div class="device-info-section">
+                            <div class="device-info-line"><strong>Конфигурация портов:</strong></div>
+                            <div class="device-info-line">• Port 1: Access (VLAN 10) → ПК1</div>
+                            <div class="device-info-line">• Port 2: Access (VLAN 20) → ПК2</div>
+                            <div class="device-info-line">• Port 3: Trunk (VLAN 10,20) → Роутер</div>
+                        </div>
+                        <div class="device-info-section">
+                            <div class="device-info-line"><strong>Функции:</strong></div>
+                            <div class="device-info-line">• VLAN сегментация</div>
+                            <div class="device-info-line">• Транкирование 802.1Q</div>
+                            <div class="device-info-line">• MAC-адресация</div>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'pc1':
+                    tooltipContent = `
+                        <div class="device-info-title">💻 ПК1 - VLAN 10</div>
+                        <div class="device-info-section">
+                            <div class="device-info-line"><strong>Сетевые настройки:</strong></div>
+                            <div class="device-info-line">• IP адрес: 192.168.10.10/24</div>
+                            <div class="device-info-line">• MAC: AA:BB:CC:DD:EE:10</div>
+                            <div class="device-info-line">• Шлюз: 192.168.10.1</div>
+                            <div class="device-info-line">• VLAN: 10</div>
+                        </div>
+                        <div class="device-info-section">
+                            <div class="device-info-line"><strong>Подключение:</strong></div>
+                            <div class="device-info-line">• Access порт коммутатора</div>
+                            <div class="device-info-line">• Синяя цветовая схема</div>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'pc2':
+                    tooltipContent = `
+                        <div class="device-info-title">💻 ПК2 - VLAN 20</div>
+                        <div class="device-info-section">
+                            <div class="device-info-line"><strong>Сетевые настройки:</strong></div>
+                            <div class="device-info-line">• IP адрес: 192.168.20.20/24</div>
+                            <div class="device-info-line">• MAC: AA:BB:CC:DD:EE:20</div>
+                            <div class="device-info-line">• Шлюз: 192.168.20.1</div>
+                            <div class="device-info-line">• VLAN: 20</div>
+                        </div>
+                        <div class="device-info-section">
+                            <div class="device-info-line"><strong>Подключение:</strong></div>
+                            <div class="device-info-line">• Access порт коммутатора</div>
+                            <div class="device-info-line">• Красная цветовая схема</div>
+                        </div>
+                    `;
+                    break;
+            }
+            
+            content.innerHTML = tooltipContent;
+            tooltip.style.display = 'block';
+            overlay.style.display = 'block';
+        }
+        
+        // Функция скрытия подсказки устройства
+        function hideDeviceTooltip() {
+            const tooltip = document.getElementById('deviceTooltip');
+            const overlay = document.getElementById('deviceOverlay');
+            tooltip.style.display = 'none';
+            overlay.style.display = 'none';
+        }
+        
         // Закрытие подсказки по нажатию Escape
         document.addEventListener('keydown', function(event) {
             if (event.key === 'Escape') {
                 const instruction = document.getElementById('instruction');
                 const overlay = document.getElementById('overlay');
+                const deviceTooltip = document.getElementById('deviceTooltip');
+                const deviceOverlay = document.getElementById('deviceOverlay');
+                
                 if (instruction.style.display === 'block') {
                     instruction.style.display = 'none';
                     overlay.style.display = 'none';
+                }
+                if (deviceTooltip.style.display === 'block') {
+                    deviceTooltip.style.display = 'none';
+                    deviceOverlay.style.display = 'none';
                 }
             }
         });
@@ -940,14 +1095,9 @@
         document.querySelector('a-scene').addEventListener('click', function(evt) {
             const clickedEl = evt.detail.intersection?.object.el;
             if (clickedEl && clickedEl.classList.contains('clickable')) {
-                const info = clickedEl.getAttribute('data-info');
-                if (info) {
-                    const lines = info.split('&#10;');
-                    let alertText = '';
-                    lines.forEach(line => {
-                        alertText += line + '\n';
-                    });
-                    alert('🔧 Сетевое устройство:\n\n' + alertText);
+                const deviceType = clickedEl.getAttribute('data-device');
+                if (deviceType) {
+                    showDeviceTooltip(deviceType);
                 }
             }
         });
