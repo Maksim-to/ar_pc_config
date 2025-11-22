@@ -429,9 +429,9 @@
             <!-- Сетевая топология Router-on-a-Stick с 3D моделями -->
             <a-entity position="0 0 0" scale="0.8 0.8 0.8" rotation="0 0 0">
                 
-                <!-- Уровень 1: Роутер (ближе к пользователю) -->
-                <a-entity id="router" position="0 0.1 -0.35">
-                    <!-- 3D модель роутера - УМЕНЬШЕНА В 1000 РАЗ ОТ ИСХОДНОГО РАЗМЕРА -->
+                <!-- Уровень 1: Роутер (ближе к пользователю и ВЫШЕ) -->
+                <a-entity id="router" position="0 0.25 -0.5">
+                    <!-- 3D модель роутера -->
                     <a-entity 
                         id="router-model"
                         obj-model="obj: url(router.obj)"
@@ -450,7 +450,7 @@
                 
                 <!-- Уровень 2: Коммутатор (дальше от пользователя) -->
                 <a-entity id="switch" position="0 0.1 0.05">
-                    <!-- 3D модель коммутатора - УВЕЛИЧЕНА В 2 РАЗА И СЕРЫЙ ЦВЕТ -->
+                    <!-- 3D модель коммутатора -->
                     <a-entity 
                         id="switch-model"
                         obj-model="obj: url(switch.obj)"
@@ -517,8 +517,8 @@
                 </a-entity>
                 
                 <!-- Сетевые соединения (правильно подключенные к портам) -->
-                <!-- Роутер -> Коммутатор (Trunk, увеличенная длина) -->
-                <a-entity line="start: 0 0.1 -0.29; end: 0 0.1 -0.005; color: #00ff88; opacity: 0.8" id="lineRouterSwitch"></a-entity>
+                <!-- Роутер -> Коммутатор (Trunk, УДЛИНЕННЫЙ кабель) -->
+                <a-entity line="start: 0 0.25 -0.44; end: 0 0.1 -0.005; color: #00ff88; opacity: 0.8" id="lineRouterSwitch"></a-entity>
                 
                 <!-- Коммутатор -> ПК1 (VLAN 10) -->
                 <a-entity line="start: -0.1 0.1 0.005; end: -0.35 0.1 0.425; color: #0099ff; opacity: 0.8" id="lineSwitchPc1"></a-entity>
@@ -568,7 +568,7 @@
         let modelsLoaded = 0;
         const totalModels = 4; // router, switch, computer (2 раза)
         
-        // ИСПРАВЛЕНИЕ БАГА: Глобальные переменные для управления анимацией
+        // Глобальные переменные для управления анимацией
         let animationTimeouts = [];
         let isPaused = false;
         let packetAnimationState = null;
@@ -619,7 +619,7 @@
             }
         });
         
-        // ИСПРАВЛЕНИЕ: Обработка кликов по устройствам с улучшенной логикой
+        // Обработка кликов по устройствам с улучшенной логикой
         function setupDeviceClickHandlers() {
             const scene = document.querySelector('a-scene');
             
@@ -802,7 +802,7 @@
             stopTransmission();
         });
         
-        // ИСПРАВЛЕНИЕ БАГА: Улучшенные функции управления передачей
+        // Улучшенные функции управления передачей
         function startVlanTransmission() {
             if (isPaused && currentPacket) {
                 // Возобновляем приостановленную анимацию
@@ -870,7 +870,7 @@
             packetAnimationState = null;
         }
         
-        // ИСПРАВЛЕНИЕ БАГА: Улучшенная функция создания пакета с управлением состоянием
+        // Улучшенная функция создания пакета с правильным маршрутом
         function createVlanPacket() {
             if (!isTransmissionActive || isPaused) return;
             
@@ -916,7 +916,7 @@
             executeAnimationStage(1, 0);
         }
         
-        // Новая функция для управления стадиями анимации с отслеживанием состояния
+        // Новая функция для управления стадиями анимации с ПРАВИЛЬНЫМ маршрутом
         function executeAnimationStage(stage, progress) {
             if (!isTransmissionActive || isPaused) return;
             
@@ -955,7 +955,8 @@
                     
                     updateVlanInfo(packetAnimationState.title, packetAnimationState.details);
                     
-                    animatePacketToPosition('0 0.1 -0.29', 2000, () => {
+                    // ПРАВИЛЬНЫЙ ПУТЬ: от коммутатора к роутеру
+                    animatePacketToPosition('0 0.25 -0.44', 2500, () => {
                         executeAnimationStage(3, 0);
                     });
                     break;
@@ -994,7 +995,8 @@
                     currentPacket.setAttribute('material', `color: ${destColor}`);
                     currentPacket.setAttribute('scale', '1 1 1');
                     
-                    animatePacketToPosition('0 0.1 -0.005', 1800, () => {
+                    // ПРАВИЛЬНЫЙ ПУТЬ: от роутера обратно к коммутатору
+                    animatePacketToPosition('0 0.1 -0.005', 2500, () => {
                         executeAnimationStage(5, 0);
                     });
                     break;
@@ -1010,7 +1012,9 @@
                     const destSwitchPos = isVlan10to20 ? '0.1 0.1 0.005' : '-0.1 0.1 0.005';
                     const destPos = isVlan10to20 ? '0.35 0.1 0.425' : '-0.35 0.1 0.425';
                     
+                    // Сначала к соответствующему порту коммутатора
                     animatePacketToPosition(destSwitchPos, 1500, () => {
+                        // Затем к получателю
                         animatePacketToPosition(destPos, 1800, () => {
                             completeTransmission();
                         });
@@ -1055,8 +1059,8 @@
             // Анимация "обработки" в роутере
             currentPacket.setAttribute('animation', {
                 property: 'position',
-                from: '0 0.1 -0.29',
-                to: '0 0.1 -0.32',
+                from: '0 0.25 -0.44',
+                to: '0 0.25 -0.47',
                 dur: 1000,
                 dir: 'alternate',
                 loop: 2
