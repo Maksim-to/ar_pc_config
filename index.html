@@ -564,7 +564,7 @@
         let isTransmissionActive = false;
         let currentPacket = null;
         let packetSequence = 0;
-        let currentDirection = 'vlan10_to_vlan20'; // Начинаем с ПК1 -> ПК2
+        let currentDirection = 'vlan10_to_vlan20';
         let modelsLoaded = 0;
         const totalModels = 4; // router, switch, computer (2 раза)
         
@@ -802,63 +802,39 @@
             stopTransmission();
         });
         
-        // ИСПРАВЛЕННЫЕ функции управления передачей
+        // ИСПРАВЛЕННЫЕ функции управления передачей с логикой из примера
         function startVlanTransmission() {
-            if (isPaused && currentPacket) {
-                // Возобновляем приостановленную анимацию
-                isPaused = false;
-                resumePacketAnimation();
-            } else if (!isTransmissionActive && !currentPacket) {
-                // Создаем новую анимацию только если нет активной передачи и нет текущего пакета
+            if (!isTransmissionActive) {
                 isTransmissionActive = true;
-                isPaused = false;
                 createVlanPacket();
             }
         }
         
         function pauseTransmission() {
-            if (isTransmissionActive && currentPacket && !isPaused) {
-                isPaused = true;
-                
-                // Останавливаем все таймеры анимации
-                animationTimeouts.forEach(timeout => clearTimeout(timeout));
-                animationTimeouts = [];
-                
-                // Останавливаем анимации A-Frame
-                if (currentPacket) {
-                    currentPacket.removeAttribute('animation');
-                    currentPacket.removeAttribute('animation__bob');
-                    currentPacket.removeAttribute('animation__scale');
-                    currentPacket.removeAttribute('animation__fade');
-                }
-                
-                updateVlanInfo('⏸️ Передача приостановлена', 'Нажмите Старт для продолжения');
+            isTransmissionActive = false;
+            if (currentPacket) {
+                currentPacket.removeAttribute('animation');
+                currentPacket.removeAttribute('animation__bob');
+                currentPacket.removeAttribute('animation__scale');
+                currentPacket.removeAttribute('animation__fade');
             }
-        }
-        
-        function resumePacketAnimation() {
-            if (packetAnimationState && currentPacket) {
-                const state = packetAnimationState;
-                
-                // Продолжаем с того места, где остановились
-                updateVlanInfo(state.title, state.details);
-                
-                // Запускаем следующую стадию анимации
-                executeAnimationStage(state.stage, state.progress);
-            }
+            
+            // Очищаем все таймеры
+            animationTimeouts.forEach(timeout => clearTimeout(timeout));
+            animationTimeouts = [];
+            
+            updateVlanInfo('⏸️ Передача приостановлена', 'Нажмите Старт для продолжения');
         }
         
         function resetTransmission() {
             stopTransmission();
             packetSequence = 0;
             currentDirection = 'vlan10_to_vlan20';
-            packetAnimationState = null;
             document.getElementById('vlanInfo').style.display = 'none';
         }
         
         function stopTransmission() {
             isTransmissionActive = false;
-            isPaused = false;
             
             // Очищаем все таймеры
             animationTimeouts.forEach(timeout => clearTimeout(timeout));
@@ -867,288 +843,231 @@
             const packetContainer = document.getElementById('packetContainer');
             packetContainer.innerHTML = '';
             currentPacket = null;
-            packetAnimationState = null;
         }
         
-        // ИСПРАВЛЕННАЯ функция создания пакета - пакет создается только у исходного ПК
+        // Функция создания пакета из примера
         function createVlanPacket() {
-            if (!isTransmissionActive || isPaused) return;
+            if (!isTransmissionActive) return;
             
             packetSequence++;
             const packetId = `packet_${packetSequence}`;
             const isVlan10to20 = currentDirection === 'vlan10_to_vlan20';
             
-            // Определяем параметры в зависимости от направления
+            // Определяем цвета и позиции в зависимости от направления
             const sourceColor = isVlan10to20 ? '#0099ff' : '#ff4444';
+            const destColor = isVlan10to20 ? '#ff4444' : '#0099ff';
             const sourceVlan = isVlan10to20 ? '10' : '20';
+            const destVlan = isVlan10to20 ? '20' : '10';
             const sourceIP = isVlan10to20 ? '192.168.10.10' : '192.168.20.20';
             const destIP = isVlan10to20 ? '192.168.20.20' : '192.168.10.10';
             const sourcePC = isVlan10to20 ? 'ПК1' : 'ПК2';
             const destPC = isVlan10to20 ? 'ПК2' : 'ПК1';
             
-            // Создание пакета в виде конверта
+            // Создание пакета в виде конверта (вертикальный прямоугольник)
             const packet = document.createElement('a-entity');
             packet.setAttribute('id', packetId);
             
-            // Конверт (вертикальный прямоугольник)
+            // Создаем конверт - вертикальный прямоугольник с правильной ориентацией
             packet.setAttribute('geometry', 'primitive: plane; width: 0.03; height: 0.05');
             packet.setAttribute('material', `color: ${sourceColor}; shader: flat; side: double; transparent: true; opacity: 0.9`);
-            packet.setAttribute('rotation', '-90 0 0');
+            packet.setAttribute('rotation', '-90 0 0'); // Поворачиваем, чтобы конверт был вертикальным
             
-            // Символ конверта
+            // Добавляем текстуру конверта (символ)
             const envelopeSymbol = document.createElement('a-entity');
             envelopeSymbol.setAttribute('text', `value: ✉️; color: white; align: center; width: 0.8`);
             envelopeSymbol.setAttribute('position', '0 0 0.001');
             envelopeSymbol.setAttribute('scale', '0.8 0.8 0.8');
-            envelopeSymbol.setAttribute('rotation', '90 0 0');
+            envelopeSymbol.setAttribute('rotation', '90 0 0'); // Компенсируем поворот родителя
             packet.appendChild(envelopeSymbol);
             
-            // Начальная позиция - от исходного ПК
+            // Начальная позиция - от порта ПК
             const startPos = isVlan10to20 ? '-0.35 0.1 0.425' : '0.35 0.1 0.425';
             packet.setAttribute('position', startPos);
             
             document.getElementById('packetContainer').appendChild(packet);
             currentPacket = packet;
             
-            // Начинаем анимацию с первой стадии
-            executeAnimationStage(1, 0);
-        }
-        
-        // ИСПРАВЛЕННАЯ функция выполнения стадий анимации - пакет идет ТОЛЬКО в одном направлении
-        function executeAnimationStage(stage, progress) {
-            if (!isTransmissionActive || isPaused) return;
+            // Обновление информации
+            updateVlanInfo(
+                `📤 ${sourcePC} → SWITCH`,
+                `Пакет #${packetSequence}<br>VLAN: ${sourceVlan}<br>От: ${sourceIP}<br>К: ${destIP}`
+            );
             
-            const isVlan10to20 = currentDirection === 'vlan10_to_vlan20';
-            const sourcePC = isVlan10to20 ? 'ПК1' : 'ПК2';
-            const destPC = isVlan10to20 ? 'ПК2' : 'ПК1';
-            const sourceVlan = isVlan10to20 ? '10' : '20';
-            const destVlan = isVlan10to20 ? '20' : '10';
-            const sourceIP = isVlan10to20 ? '192.168.10.10' : '192.168.20.20';
-            const destIP = isVlan10to20 ? '192.168.20.20' : '192.168.10.10';
+            // Этап 1: От ПК к коммутатору (вдоль кабеля)
+            const switchPos = isVlan10to20 ? '-0.1 0.1 0.005' : '0.1 0.1 0.005';
             
-            switch(stage) {
-                case 1: // ПК -> Коммутатор (Access порт)
-                    packetAnimationState = {
-                        stage: 1,
-                        progress: progress,
-                        title: `📤 ${sourcePC} → SWITCH`,
-                        details: `Пакет #${packetSequence}<br>От: ${sourceIP}<br>К: ${destIP}<br>VLAN: ${sourceVlan} (Untagged)`
-                    };
-                    
-                    updateVlanInfo(packetAnimationState.title, packetAnimationState.details);
-                    
-                    const switchAccessPos = isVlan10to20 ? '-0.1 0.1 0.005' : '0.1 0.1 0.005';
-                    animatePacketToPosition(switchAccessPos, 1500, () => {
-                        executeAnimationStage(2, 0);
-                    });
-                    break;
-                    
-                case 2: // Коммутатор добавляет VLAN tag и отправляет по Trunk
-                    packetAnimationState = {
-                        stage: 2,
-                        progress: progress,
-                        title: '🏷️ SWITCH: Добавление VLAN Tag',
-                        details: `Пакет #${packetSequence}<br>VLAN Tag: ${sourceVlan} добавлен<br>Отправка через Trunk порт`
-                    };
-                    
-                    updateVlanInfo(packetAnimationState.title, packetAnimationState.details);
-                    
-                    // Анимация обработки в коммутаторе
-                    animatePacketProcessingAtSwitch(() => {
-                        // Меняем цвет на trunk цвет
-                        currentPacket.setAttribute('material', `color: #00ff88`);
-                        
-                        // Двигаем к роутеру по trunk
-                        animatePacketToPosition('0 0.05 -0.44', 2000, () => {
-                            executeAnimationStage(3, 0);
-                        });
-                    });
-                    break;
-                    
-                case 3: // Роутер принимает пакет, снимает VLAN tag и маршрутизирует
-                    packetAnimationState = {
-                        stage: 3,
-                        progress: progress,
-                        title: '🔄 ROUTER: Меж VLAN Маршрутизация',
-                        details: `Пакет #${packetSequence}<br>Сабинтерфейс Gi0/0.${sourceVlan}<br>Снятие VLAN Tag ${sourceVlan}<br>Маршрутизация на VLAN ${destVlan}`
-                    };
-                    
-                    updateVlanInfo(packetAnimationState.title, packetAnimationState.details);
-                    
-                    // Поднимаем пакет к роутеру для обработки
-                    animatePacketToPosition('0 0.25 -0.44', 1000, () => {
-                        // Анимация обработки в роутере
-                        animatePacketProcessingAtRouter(() => {
-                            // Меняем VLAN tag на целевой
-                            currentPacket.setAttribute('material', `color: #00ff88`);
-                            executeAnimationStage(4, 0);
-                        });
-                    });
-                    break;
-                    
-                case 4: // Роутер отправляет пакет обратно с новым VLAN tag
-                    packetAnimationState = {
-                        stage: 4,
-                        progress: progress,
-                        title: '🏷️ ROUTER: Добавление VLAN Tag',
-                        details: `Пакет #${packetSequence}<br>Новый VLAN Tag: ${destVlan}<br>Отправка через сабинтерфейс Gi0/0.${destVlan}`
-                    };
-                    
-                    updateVlanInfo(packetAnimationState.title, packetAnimationState.details);
-                    
-                    // Опускаем пакет обратно к trunk
-                    animatePacketToPosition('0 0.05 -0.44', 1000, () => {
-                        executeAnimationStage(5, 0);
-                    });
-                    break;
-                    
-                case 5: // Коммутатор получает пакет по trunk, снимает VLAN tag
-                    packetAnimationState = {
-                        stage: 5,
-                        progress: progress,
-                        title: '🏷️ SWITCH: Снятие VLAN Tag',
-                        details: `Пакет #${packetSequence}<br>VLAN Tag ${destVlan} снят<br>Отправка на Access порт VLAN ${destVlan}`
-                    };
-                    
-                    updateVlanInfo(packetAnimationState.title, packetAnimationState.details);
-                    
-                    // Двигаем к коммутатору
-                    animatePacketToPosition('0 0.05 -0.005', 1500, () => {
-                        // Анимация обработки в коммутаторе
-                        animatePacketProcessingAtSwitch(() => {
-                            // Меняем цвет на цвет целевого VLAN
-                            const destColor = isVlan10to20 ? '#ff4444' : '#0099ff';
-                            currentPacket.setAttribute('material', `color: ${destColor}`);
-                            
-                            const destSwitchPos = isVlan10to20 ? '0.1 0.1 0.005' : '-0.1 0.1 0.005';
-                            animatePacketToPosition(destSwitchPos, 1500, () => {
-                                executeAnimationStage(6, 0);
-                            });
-                        });
-                    });
-                    break;
-                    
-                case 6: // Коммутатор -> Получатель (Access порт) - ФИНАЛЬНАЯ СТАДИЯ
-                    packetAnimationState = {
-                        stage: 6,
-                        progress: progress,
-                        title: `📥 Доставка ${destPC}`,
-                        details: `Пакет #${packetSequence}<br>Успешно доставлен!<br>VLAN ${destVlan}`
-                    };
-                    
-                    const destPos = isVlan10to20 ? '0.35 0.1 0.425' : '-0.35 0.1 0.425';
-                    
-                    // Отправляем к получателю - ФИНАЛЬНАЯ ТОЧКА
-                    animatePacketToPosition(destPos, 1500, () => {
-                        completeTransmission();
-                    });
-                    break;
-            }
-        }
-        
-        // Новые функции анимации для обработки в устройствах
-        function animatePacketProcessingAtSwitch(callback) {
-            if (!isTransmissionActive || isPaused || !currentPacket) return;
-            
-            // Анимация "обработки" в коммутаторе - небольшое движение вверх-вниз
-            currentPacket.setAttribute('animation', {
+            packet.setAttribute('animation', {
                 property: 'position',
-                from: currentPacket.getAttribute('position'),
-                to: `${currentPacket.getAttribute('position').x} ${parseFloat(currentPacket.getAttribute('position').y) + 0.05} ${currentPacket.getAttribute('position').z}`,
-                dur: 800,
-                dir: 'alternate',
-                loop: 2
-            });
-            
-            const timeout = setTimeout(() => {
-                if (isTransmissionActive && !isPaused && callback) {
-                    currentPacket.removeAttribute('animation');
-                    callback();
-                }
-            }, 1600);
-            
-            animationTimeouts.push(timeout);
-        }
-        
-        function animatePacketProcessingAtRouter(callback) {
-            if (!isTransmissionActive || isPaused || !currentPacket) return;
-            
-            // Анимация "обработки" в роутере - вращение и изменение размера
-            currentPacket.setAttribute('animation', {
-                property: 'rotation',
-                from: '-90 0 0',
-                to: '-90 360 0',
-                dur: 1500
-            });
-            
-            currentPacket.setAttribute('animation__scale', {
-                property: 'scale',
-                to: '1.3 1.3 1.3',
-                dur: 750,
-                dir: 'alternate',
-                loop: 2
-            });
-            
-            const timeout = setTimeout(() => {
-                if (isTransmissionActive && !isPaused && callback) {
-                    currentPacket.removeAttribute('animation');
-                    currentPacket.removeAttribute('animation__scale');
-                    currentPacket.setAttribute('scale', '1 1 1');
-                    callback();
-                }
-            }, 1500);
-            
-            animationTimeouts.push(timeout);
-        }
-        
-        // Вспомогательные функции анимации
-        function animatePacketToPosition(targetPos, duration, callback) {
-            if (!isTransmissionActive || isPaused || !currentPacket) return;
-            
-            currentPacket.setAttribute('animation', {
-                property: 'position',
-                to: targetPos,
-                dur: duration,
+                from: startPos,
+                to: switchPos,
+                dur: 2000,
                 easing: 'easeInOutQuad'
             });
             
-            currentPacket.setAttribute('animation__bob', {
+            // Добавляем небольшую анимацию "покачивания" конверта
+            packet.setAttribute('animation__bob', {
                 property: 'position',
-                to: `${targetPos.split(' ')[0]} ${parseFloat(targetPos.split(' ')[1]) + 0.02} ${targetPos.split(' ')[2]}`,
-                dur: 800,
+                to: `${switchPos.split(' ')[0]} ${parseFloat(switchPos.split(' ')[1]) + 0.02} ${switchPos.split(' ')[2]}`,
+                dur: 1000,
                 dir: 'alternate',
-                loop: true
+                loop: true,
+                startEvents: 'start'
             });
             
-            const timeout = setTimeout(() => {
-                if (isTransmissionActive && !isPaused && callback) {
-                    currentPacket.removeAttribute('animation__bob');
-                    callback();
-                }
-            }, duration);
+            // Этап 2: Коммутатор -> Роутер (вдоль trunk кабеля)
+            const timeout1 = setTimeout(() => {
+                if (!isTransmissionActive) return;
+                packet.setAttribute('animation', {
+                    property: 'position',
+                    from: switchPos,
+                    to: '0 0.05 -0.44',
+                    dur: 2000,
+                    easing: 'easeInOutQuad'
+                });
+                updateVlanInfo(
+                    '🔄 SWITCH → ROUTER',
+                    `Пакет #${packetSequence}<br>Trunk порт<br>VLAN Tag: ${sourceVlan}`
+                );
+            }, 2000);
             
-            animationTimeouts.push(timeout);
-        }
-        
-        // ИСПРАВЛЕННАЯ функция завершения передачи - пакет остается у получателя
-        function completeTransmission() {
-            if (!currentPacket) return;
+            // Этап 3: Роутер (меж VLAN маршрутизация)
+            const timeout2 = setTimeout(() => {
+                if (!isTransmissionActive) return;
+                // Меняем цвет конверта при маршрутизации
+                packet.setAttribute('material', `color: #00ff88;`);
+                
+                // Анимация "обработки" в роутере (небольшое движение вглубь и обратно)
+                packet.setAttribute('animation', {
+                    property: 'position',
+                    from: '0 0.05 -0.44',
+                    to: '0 0.05 -0.47',
+                    dur: 1000,
+                    dir: 'alternate',
+                    loop: 2
+                });
+                
+                // Анимация изменения размера для эффекта "обработки"
+                packet.setAttribute('animation__scale', {
+                    property: 'scale',
+                    to: '1.2 1.2 1.2',
+                    dur: 500,
+                    dir: 'alternate',
+                    loop: 2
+                });
+                
+                updateVlanInfo(
+                    '🏷️ Меж VLAN Маршрутизация',
+                    `Пакет #${packetSequence}<br>Сабинтерфейс: Gi0/0.${sourceVlan}<br>Смена VLAN Tag: ${sourceVlan} → ${destVlan}`
+                );
+            }, 4000);
             
-            // Пакет остается у получателя, не исчезает
-            updateVlanInfo(
-                '✅ Передача завершена',
-                `Пакет #${packetSequence} доставлен в ${currentDirection === 'vlan10_to_vlan20' ? 'ПК2' : 'ПК1'}<br>Нажмите Старт для следующей передачи`
-            );
-            
-            // Меняем направление для следующего запуска
-            currentDirection = currentDirection === 'vlan10_to_vlan20' ? 'vlan20_to_vlan10' : 'vlan10_to_vlan20';
-            isTransmissionActive = false;
-            packetAnimationState = null;
-            
-            // Автоскрытие информации через 5 секунд
-            setTimeout(() => {
-                document.getElementById('vlanInfo').style.display = 'none';
+            // Этап 4: Роутер -> Коммутатор (обратно по trunk)
+            const timeout3 = setTimeout(() => {
+                if (!isTransmissionActive) return;
+                // Меняем цвет конверта на цвет VLAN назначения
+                packet.setAttribute('material', `color: ${destColor}`);
+                
+                // Сбрасываем масштаб
+                packet.setAttribute('scale', '1 1 1');
+                
+                packet.setAttribute('animation', {
+                    property: 'position',
+                    from: '0 0.05 -0.44',
+                    to: '0 0.05 -0.005',
+                    dur: 1800,
+                    easing: 'easeInOutQuad'
+                });
+                updateVlanInfo(
+                    '🔄 ROUTER → SWITCH',
+                    `Пакет #${packetSequence}<br>Новый VLAN: ${destVlan}<br>Назначение: ${destIP}`
+                );
             }, 5000);
+            
+            // Этап 5: Коммутатор -> Получатель (вдоль кабеля)
+            const timeout4 = setTimeout(() => {
+                if (!isTransmissionActive) return;
+                const destSwitchPos = isVlan10to20 ? '0.1 0.1 0.005' : '-0.1 0.1 0.005';
+                const destPos = isVlan10to20 ? '0.35 0.1 0.425' : '-0.35 0.1 0.425';
+                
+                packet.setAttribute('animation', {
+                    property: 'position',
+                    from: '0 0.05 -0.005',
+                    to: destSwitchPos,
+                    dur: 1500,
+                    easing: 'easeInOutQuad'
+                });
+                
+                // Этап 6: Финальный отрезок к получателю
+                const timeout5 = setTimeout(() => {
+                    if (!isTransmissionActive) return;
+                    packet.setAttribute('animation', {
+                        property: 'position',
+                        from: destSwitchPos,
+                        to: destPos,
+                        dur: 1800,
+                        easing: 'easeInOutQuad'
+                    });
+                    updateVlanInfo(
+                        `📥 Доставка ${destPC}`,
+                        `Пакет #${packetSequence}<br>Успешно доставлен!<br>VLAN ${destVlan}`
+                    );
+                    
+                    // Завершение анимации
+                    const timeout6 = setTimeout(() => {
+                        if (!isTransmissionActive) return;
+                        
+                        // Эффект "поглощения" пакета получателем
+                        packet.setAttribute('animation', {
+                            property: 'scale',
+                            from: '1 1 1',
+                            to: '0.1 0.1 0.1',
+                            dur: 500
+                        });
+                        
+                        // Эффект исчезновения
+                        packet.setAttribute('animation__fade', {
+                            property: 'material.opacity',
+                            from: '0.9',
+                            to: '0',
+                            dur: 500
+                        });
+                        
+                        const timeout7 = setTimeout(() => {
+                            packet.remove();
+                            currentPacket = null;
+                            
+                            // Меняем направление для следующего запуска
+                            currentDirection = currentDirection === 'vlan10_to_vlan20' ? 'vlan20_to_vlan10' : 'vlan10_to_vlan20';
+                            
+                            // Автоматически не запускаем следующий пакет
+                            isTransmissionActive = false;
+                            
+                            // Показываем сообщение о завершении
+                            updateVlanInfo(
+                                '✅ Передача завершена',
+                                `Пакет #${packetSequence} доставлен<br>Следующий запуск: ${currentDirection === 'vlan10_to_vlan20' ? 'ПК1 → ПК2' : 'ПК2 → ПК1'}`
+                            );
+                            
+                            // Автоскрытие информации через 3 секунды
+                            const timeout8 = setTimeout(() => {
+                                document.getElementById('vlanInfo').style.display = 'none';
+                            }, 3000);
+                            
+                            animationTimeouts.push(timeout8);
+                            
+                        }, 500);
+                        
+                        animationTimeouts.push(timeout7);
+                    }, 1800);
+                    
+                    animationTimeouts.push(timeout6);
+                }, 1500);
+                
+                animationTimeouts.push(timeout5);
+            }, 6800);
+            
+            // Сохраняем все таймеры для возможности их очистки
+            animationTimeouts.push(timeout1, timeout2, timeout3, timeout4);
         }
         
         function updateVlanInfo(title, details) {
