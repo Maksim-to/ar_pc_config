@@ -517,8 +517,8 @@
                 </a-entity>
                 
                 <!-- Сетевые соединения (правильно подключенные к портам) -->
-                <!-- Роутер -> Коммутатор (Trunk, УДЛИНЕННЫЙ кабель) -->
-                <a-entity line="start: 0 0.25 -0.44; end: 0 0.1 -0.005; color: #00ff88; opacity: 0.8" id="lineRouterSwitch"></a-entity>
+                <!-- Роутер -> Коммутатор (Trunk, УДЛИНЕННЫЙ кабель на ЗАДНЕМ ПЛАНЕ) -->
+                <a-entity line="start: 0 0.05 -0.44; end: 0 0.05 -0.005; color: #00ff88; opacity: 0.6" id="lineRouterSwitch"></a-entity>
                 
                 <!-- Коммутатор -> ПК1 (VLAN 10) -->
                 <a-entity line="start: -0.1 0.1 0.005; end: -0.35 0.1 0.425; color: #0099ff; opacity: 0.8" id="lineSwitchPc1"></a-entity>
@@ -955,8 +955,8 @@
                     
                     updateVlanInfo(packetAnimationState.title, packetAnimationState.details);
                     
-                    // ПРАВИЛЬНЫЙ ПУТЬ: от коммутатора к роутеру
-                    animatePacketToPosition('0 0.25 -0.44', 2500, () => {
+                    // ПРАВИЛЬНЫЙ ПУТЬ: от коммутатора к роутеру по НИЗКОМУ кабелю
+                    animatePacketToPosition('0 0.05 -0.44', 2500, () => {
                         executeAnimationStage(3, 0);
                     });
                     break;
@@ -971,12 +971,15 @@
                     
                     updateVlanInfo(packetAnimationState.title, packetAnimationState.details);
                     
-                    // Меняем цвет конверта
-                    currentPacket.setAttribute('material', `color: #00ff88;`);
-                    
-                    // Анимация обработки
-                    animatePacketProcessing(() => {
-                        executeAnimationStage(4, 0);
+                    // Поднимаем пакет к роутеру для обработки
+                    animatePacketToPosition('0 0.25 -0.44', 800, () => {
+                        // Меняем цвет конверта
+                        currentPacket.setAttribute('material', `color: #00ff88;`);
+                        
+                        // Анимация обработки
+                        animatePacketProcessing(() => {
+                            executeAnimationStage(4, 0);
+                        });
                     });
                     break;
                     
@@ -990,14 +993,17 @@
                     
                     updateVlanInfo(packetAnimationState.title, packetAnimationState.details);
                     
-                    // Меняем цвет конверта на цвет VLAN назначения
-                    const destColor = isVlan10to20 ? '#ff4444' : '#0099ff';
-                    currentPacket.setAttribute('material', `color: ${destColor}`);
-                    currentPacket.setAttribute('scale', '1 1 1');
-                    
-                    // ПРАВИЛЬНЫЙ ПУТЬ: от роутера обратно к коммутатору
-                    animatePacketToPosition('0 0.1 -0.005', 2500, () => {
-                        executeAnimationStage(5, 0);
+                    // Опускаем пакет обратно к кабелю
+                    animatePacketToPosition('0 0.05 -0.44', 800, () => {
+                        // Меняем цвет конверта на цвет VLAN назначения
+                        const destColor = isVlan10to20 ? '#ff4444' : '#0099ff';
+                        currentPacket.setAttribute('material', `color: ${destColor}`);
+                        currentPacket.setAttribute('scale', '1 1 1');
+                        
+                        // ПРАВИЛЬНЫЙ ПУТЬ: от роутера обратно к коммутатору
+                        animatePacketToPosition('0 0.05 -0.005', 2500, () => {
+                            executeAnimationStage(5, 0);
+                        });
                     });
                     break;
                     
@@ -1012,7 +1018,7 @@
                     const destSwitchPos = isVlan10to20 ? '0.1 0.1 0.005' : '-0.1 0.1 0.005';
                     const destPos = isVlan10to20 ? '0.35 0.1 0.425' : '-0.35 0.1 0.425';
                     
-                    // Сначала к соответствующему порту коммутатора
+                    // Поднимаем пакет от кабеля к порту коммутатора
                     animatePacketToPosition(destSwitchPos, 1500, () => {
                         // Затем к получателю
                         animatePacketToPosition(destPos, 1800, () => {
