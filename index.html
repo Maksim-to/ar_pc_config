@@ -426,17 +426,18 @@
             size="0.16"
             id="networkMarker">
             
-            <!-- ИСПРАВЛЕННАЯ Сетевая топология Router-on-a-Stick -->
+            <!-- Сетевая топология Router-on-a-Stick с 3D моделями -->
             <a-entity position="0 0 0" scale="0.8 0.8 0.8" rotation="0 0 0">
                 
-                <!-- Роутер (центральное положение) -->
-                <a-entity id="router" position="0 0.25 0">
+                <!-- Уровень 1: Роутер (ближе к пользователю и ВЫШЕ) -->
+                <a-entity id="router" position="0 0.25 -0.5">
                     <!-- 3D модель роутера -->
                     <a-entity 
                         id="router-model"
-                        geometry="primitive: box; width: 0.25; height: 0.15; depth: 0.2"
+                        obj-model="obj: url(router.obj)"
                         position="0 0 0"
-                        material="color: #ffaa00; metalness: 0.3; roughness: 0.7"
+                        scale="0.001 0.001 0.001"
+                        rotation="270 180 180"
                         class="clickable"
                         data-info="Маршрутизатор&#10;Gi0/0.10: 192.168.10.1/24&#10;Gi0/0.20: 192.168.20.1/24&#10;Router-on-a-Stick конфигурация">
                     </a-entity>
@@ -447,88 +448,91 @@
                     </a-entity>
                 </a-entity>
                 
-                <!-- Коммутатор (под роутером) -->
-                <a-entity id="switch" position="0 0.1 0.3">
+                <!-- Уровень 2: Коммутатор (дальше от пользователя) -->
+                <a-entity id="switch" position="0 0.1 0.05">
                     <!-- 3D модель коммутатора -->
                     <a-entity 
                         id="switch-model"
-                        geometry="primitive: box; width: 0.35; height: 0.1; depth: 0.25"
+                        obj-model="obj: url(switch.obj)"
                         position="0 0 0"
-                        material="color: #888888; metalness: 0.4; roughness: 0.6"
+                        scale="0.0006 0.0006 0.0006"
+                        rotation="0 0 0"
                         class="clickable"
                         data-info="Коммутатор L2&#10;Port1: VLAN 10 (Access)&#10;Port2: VLAN 20 (Access)&#10;Port3: VLAN 10,20 (Trunk)">
                     </a-entity>
                     <a-entity 
                         text="value: SWITCH; color: white; align: center; width: 1.2"
-                        position="0 -0.12 0"
+                        position="0 -0.2 0"
                         scale="0.25 0.25 0.25">
                     </a-entity>
                 </a-entity>
                 
-                <!-- Компьютеры -->
+                <!-- Уровень 3: Компьютеры (самые дальние от пользователя) -->
                 <!-- ПК1 (VLAN 10) -->
-                <a-entity id="pc1" position="-0.5 0.08 0.6">
+                <a-entity id="pc1" position="-0.4 0.08 0.45">
                     <!-- 3D модель компьютера -->
                     <a-entity 
                         id="pc1-model"
-                        geometry="primitive: box; width: 0.15; height: 0.1; depth: 0.1"
+                        obj-model="obj: url(computer.obj)"
                         position="0 0 0"
-                        material="color: #0099ff; metalness: 0.2; roughness: 0.8"
+                        scale="0.12 0.12 0.12"
+                        rotation="0 180 0"
                         class="clickable"
                         data-info="ПК1 - VLAN 10&#10;IP: 192.168.10.10/24&#10;MAC: AA:BB:CC:DD:EE:10&#10;Шлюз: 192.168.10.1">
                     </a-entity>
                     <a-entity 
                         text="value: ПК1; color: white; align: center; width: 0.8"
-                        position="0 -0.12 0"
+                        position="0 -0.15 0"
                         scale="0.18 0.18 0.18">
                     </a-entity>
                     <a-entity 
                         text="value: (VLAN10); color: #0099ff; align: center; width: 1.0"
-                        position="0 -0.18 0"
+                        position="0 -0.22 0"
                         scale="0.15 0.15 0.15">
                     </a-entity>
                 </a-entity>
                 
                 <!-- ПК2 (VLAN 20) -->
-                <a-entity id="pc2" position="0.5 0.08 0.6">
+                <a-entity id="pc2" position="0.4 0.08 0.45">
                     <!-- 3D модель компьютера -->
                     <a-entity 
                         id="pc2-model"
-                        geometry="primitive: box; width: 0.15; height: 0.1; depth: 0.1"
+                        obj-model="obj: url(computer.obj)"
                         position="0 0 0"
-                        material="color: #ff4444; metalness: 0.2; roughness: 0.8"
+                        scale="0.12 0.12 0.12"
+                        rotation="0 180 0"
                         class="clickable"
                         data-info="ПК2 - VLAN 20&#10;IP: 192.168.20.20/24&#10;MAC: AA:BB:CC:DD:EE:20&#10;Шлюз: 192.168.20.1">
                     </a-entity>
                     <a-entity 
                         text="value: ПК2; color: white; align: center; width: 0.8"
-                        position="0 -0.12 0"
+                        position="0 -0.15 0"
                         scale="0.18 0.18 0.18">
                     </a-entity>
                     <a-entity 
                         text="value: (VLAN20); color: #ff4444; align: center; width: 1.0"
-                        position="0 -0.18 0"
+                        position="0 -0.22 0"
                         scale="0.15 0.15 0.15">
                     </a-entity>
                 </a-entity>
                 
-                <!-- ИСПРАВЛЕННЫЕ Сетевые соединения -->
-                <!-- Роутер -> Коммутатор (Trunk соединение) -->
-                <a-entity line="start: 0 0.17 0.1; end: 0 0.13 0.275; color: #00ff88; opacity: 0.8" id="lineRouterSwitch"></a-entity>
+                <!-- Сетевые соединения (правильно подключенные к портам) -->
+                <!-- Роутер -> Коммутатор (Trunk, УДЛИНЕННЫЙ кабель на ЗАДНЕМ ПЛАНЕ) -->
+                <a-entity line="start: 0 0.05 -0.44; end: 0 0.05 -0.005; color: #00ff88; opacity: 0.6" id="lineRouterSwitch"></a-entity>
                 
-                <!-- Коммутатор -> ПК1 (Access VLAN 10) -->
-                <a-entity line="start: -0.175 0.1 0.425; end: -0.425 0.1 0.55; color: #0099ff; opacity: 0.8" id="lineSwitchPc1"></a-entity>
+                <!-- Коммутатор -> ПК1 (VLAN 10) -->
+                <a-entity line="start: -0.1 0.1 0.005; end: -0.35 0.1 0.425; color: #0099ff; opacity: 0.8" id="lineSwitchPc1"></a-entity>
                 
-                <!-- Коммутатор -> ПК2 (Access VLAN 20) -->
-                <a-entity line="start: 0.175 0.1 0.425; end: 0.425 0.1 0.55; color: #ff4444; opacity: 0.8" id="lineSwitchPc2"></a-entity>
+                <!-- Коммутатор -> ПК2 (VLAN 20) -->
+                <a-entity line="start: 0.1 0.1 0.005; end: 0.35 0.1 0.425; color: #ff4444; opacity: 0.8" id="lineSwitchPc2"></a-entity>
                 
-                <!-- Анимированные пакеты -->
+                <!-- Анимированные пакеты (конверты вдоль кабелей) -->
                 <a-entity id="packetContainer">
                     <!-- Пакеты будут создаваться динамически -->
                 </a-entity>
                 
-                <!-- Легенда VLAN -->
-                <a-entity position="0 0.5 0">
+                <!-- Легенда VLAN (сверху) -->
+                <a-entity position="0 0.5 -0.35">
                     <a-entity 
                         text="value: VLAN 10: 192.168.10.0/24; color: #0099ff; align: center; width: 3.0"
                         position="-0.5 0 0"
@@ -544,7 +548,7 @@
                 <!-- Освещение -->
                 <a-light type="ambient" color="#ffffff" intensity="0.6"></a-light>
                 <a-light type="directional" position="0 3 -1" intensity="0.9" color="#ffffff"></a-light>
-                <a-light type="point" position="0 2 0" intensity="0.5" color="#00ff88"></a-light>
+                <a-light type="point" position="0 2 -0.5" intensity="0.5" color="#00ff88"></a-light>
                 <a-light type="point" position="-2 1 1" intensity="0.3" color="#0099ff"></a-light>
                 <a-light type="point" position="2 1 1" intensity="0.3" color="#ff4444"></a-light>
                 
@@ -562,7 +566,7 @@
         let packetSequence = 0;
         let currentDirection = 'vlan10_to_vlan20';
         let modelsLoaded = 0;
-        const totalModels = 4;
+        const totalModels = 4; // router, switch, computer (2 раза)
         
         // Глобальные переменные для управления анимацией
         let animationTimeouts = [];
@@ -571,15 +575,20 @@
         
         // Функция переключения вкладок
         function switchTab(tabName) {
+            // Скрываем все вкладки
             document.querySelectorAll('.tab-content').forEach(tab => {
                 tab.classList.remove('active');
             });
             
+            // Убираем активный класс со всех кнопок
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
             
+            // Показываем выбранную вкладку
             document.getElementById(tabName + '-tab').classList.add('active');
+            
+            // Активируем выбранную кнопку
             event.target.classList.add('active');
         }
         
@@ -610,13 +619,15 @@
             }
         });
         
-        // Обработка кликов по устройствам
+        // Обработка кликов по устройствам с улучшенной логикой
         function setupDeviceClickHandlers() {
             const scene = document.querySelector('a-scene');
             
+            // Добавляем обработчик для всей сцены
             scene.addEventListener('click', function(evt) {
                 const clickedEl = evt.detail.intersection?.object.el;
                 
+                // Проверяем все возможные родительские элементы с классом clickable
                 let targetElement = clickedEl;
                 while (targetElement) {
                     if (targetElement.classList && targetElement.classList.contains('clickable')) {
@@ -628,6 +639,7 @@
                 }
             });
             
+            // Альтернативный подход: добавляем обработчики напрямую к моделям
             setTimeout(() => {
                 const clickableElements = document.querySelectorAll('.clickable');
                 clickableElements.forEach(el => {
@@ -648,12 +660,14 @@
                     alertText += line + '\n';
                 });
                 
+                // Создаем красивый alert с информацией об устройстве
                 const deviceName = lines[0].split(' - ')[0];
                 showCustomAlert('🔧 ' + deviceName, alertText);
             }
         }
         
         function showCustomAlert(title, message) {
+            // Создаем кастомное модальное окно
             const modal = document.createElement('div');
             modal.className = 'custom-alert';
             modal.innerHTML = `
@@ -664,6 +678,7 @@
             
             document.body.appendChild(modal);
             
+            // Закрытие по клику вне модального окна
             const overlay = document.createElement('div');
             overlay.className = 'custom-alert-overlay';
             overlay.onclick = function() {
@@ -671,6 +686,188 @@
                 overlay.remove();
             };
             document.body.appendChild(overlay);
+        }
+        
+        // Отслеживание загрузки моделей
+        function onModelLoaded() {
+            modelsLoaded++;
+            const progress = 20 + (modelsLoaded / totalModels) * 70;
+            updateProgress(`Модели: ${modelsLoaded}/${totalModels}`, progress);
+            
+            if (modelsLoaded === totalModels) {
+                setTimeout(() => {
+                    updateProgress('Готово!', 100);
+                    setTimeout(() => {
+                        document.getElementById('loading').style.display = 'none';
+                        // Принудительно применяем материалы после загрузки всех моделей
+                        applyMaterialsAfterLoad();
+                        // Настраиваем обработчики кликов после загрузки моделей
+                        setupDeviceClickHandlers();
+                    }, 800);
+                }, 1000);
+            }
+        }
+        
+        function updateProgress(text, percent) {
+            document.getElementById('loadStatus').textContent = text;
+            document.getElementById('progressFill').style.width = percent + '%';
+        }
+        
+        // Применение материалов после загрузки моделей
+        function applyMaterialsAfterLoad() {
+            // Для коммутатора принудительно применяем серый цвет
+            const switchModel = document.getElementById('switch-model');
+            if (switchModel) {
+                switchModel.setAttribute('material', 'color', '#888888');
+                switchModel.setAttribute('material', 'metalness', '0.4');
+                switchModel.setAttribute('material', 'roughness', '0.6');
+            }
+            
+            // Для других устройств также убедимся, что цвета применены
+            const routerModel = document.getElementById('router-model');
+            if (routerModel) {
+                routerModel.setAttribute('material', 'color', '#ffaa00');
+                routerModel.setAttribute('material', 'metalness', '0.3');
+                routerModel.setAttribute('material', 'roughness', '0.7');
+            }
+            
+            const pc1Model = document.getElementById('pc1-model');
+            if (pc1Model) {
+                pc1Model.setAttribute('material', 'color', '#0099ff');
+                pc1Model.setAttribute('material', 'metalness', '0.2');
+                pc1Model.setAttribute('material', 'roughness', '0.8');
+            }
+            
+            const pc2Model = document.getElementById('pc2-model');
+            if (pc2Model) {
+                pc2Model.setAttribute('material', 'color', '#ff4444');
+                pc2Model.setAttribute('material', 'metalness', '0.2');
+                pc2Model.setAttribute('material', 'roughness', '0.8');
+            }
+        }
+        
+        // Функция для создания резервных моделей
+        function createFallbackModels() {
+            // Резервный коммутатор (если OBJ не загрузится)
+            const switchModel = document.getElementById('switch-model');
+            
+            if (switchModel) {
+                switchModel.addEventListener('model-error', () => {
+                    // Создаем резервный box вместо OBJ модели
+                    const box = document.createElement('a-box');
+                    box.setAttribute('width', '0.3');
+                    box.setAttribute('height', '0.15');
+                    box.setAttribute('depth', '0.2');
+                    box.setAttribute('position', '0 0.075 0');
+                    box.setAttribute('color', '#888888');
+                    box.setAttribute('metalness', '0.4');
+                    box.setAttribute('roughness', '0.6');
+                    box.setAttribute('class', 'clickable');
+                    
+                    document.getElementById('switch').appendChild(box);
+                    console.log('Создан резервный коммутатор');
+                    onModelLoaded();
+                });
+            }
+        }
+        
+        // Симуляция начальной загрузки
+        let loadProgress = 0;
+        const loadInterval = setInterval(() => {
+            loadProgress += Math.random() * 10;
+            if (loadProgress >= 20) {
+                loadProgress = 20;
+                clearInterval(loadInterval);
+            }
+            document.getElementById('progressFill').style.width = loadProgress + '%';
+        }, 200);
+        
+        // Отслеживание маркера
+        const marker = document.getElementById('networkMarker');
+        const statusDiv = document.getElementById('markerStatus');
+        const controlsDiv = document.getElementById('controls');
+        
+        marker.addEventListener('markerFound', () => {
+            statusDiv.innerHTML = '✅ Топология активирована!';
+            statusDiv.style.color = '#00ff00';
+            statusDiv.style.borderColor = '#00ff00';
+            controlsDiv.style.display = 'flex';
+        });
+        
+        marker.addEventListener('markerLost', () => {
+            statusDiv.innerHTML = '❌ Ожидание маркера...';
+            statusDiv.style.color = '#ff4444';
+            statusDiv.style.borderColor = '#ff4444';
+            controlsDiv.style.display = 'none';
+            stopTransmission();
+        });
+        
+        // ИСПРАВЛЕННЫЕ функции управления передачей с правильной логикой Router-on-a-Stick
+        function startVlanTransmission() {
+            if (isPaused && currentPacket) {
+                // Возобновляем приостановленную анимацию
+                isPaused = false;
+                resumePacketAnimation();
+            } else if (!isTransmissionActive && !currentPacket) {
+                // Создаем новую анимацию только если нет активной передачи и нет текущего пакета
+                isTransmissionActive = true;
+                isPaused = false;
+                createVlanPacket();
+            }
+        }
+        
+        function pauseTransmission() {
+            if (isTransmissionActive && currentPacket && !isPaused) {
+                isPaused = true;
+                
+                // Останавливаем все таймеры анимации
+                animationTimeouts.forEach(timeout => clearTimeout(timeout));
+                animationTimeouts = [];
+                
+                // Останавливаем анимации A-Frame
+                if (currentPacket) {
+                    currentPacket.removeAttribute('animation');
+                    currentPacket.removeAttribute('animation__bob');
+                    currentPacket.removeAttribute('animation__scale');
+                    currentPacket.removeAttribute('animation__fade');
+                }
+                
+                updateVlanInfo('⏸️ Передача приостановлена', 'Нажмите Старт для продолжения');
+            }
+        }
+        
+        function resumePacketAnimation() {
+            if (packetAnimationState && currentPacket) {
+                const state = packetAnimationState;
+                
+                // Продолжаем с того места, где остановились
+                updateVlanInfo(state.title, state.details);
+                
+                // Запускаем следующую стадию анимации
+                executeAnimationStage(state.stage, state.progress);
+            }
+        }
+        
+        function resetTransmission() {
+            stopTransmission();
+            packetSequence = 0;
+            currentDirection = 'vlan10_to_vlan20';
+            packetAnimationState = null;
+            document.getElementById('vlanInfo').style.display = 'none';
+        }
+        
+        function stopTransmission() {
+            isTransmissionActive = false;
+            isPaused = false;
+            
+            // Очищаем все таймеры
+            animationTimeouts.forEach(timeout => clearTimeout(timeout));
+            animationTimeouts = [];
+            
+            const packetContainer = document.getElementById('packetContainer');
+            packetContainer.innerHTML = '';
+            currentPacket = null;
+            packetAnimationState = null;
         }
         
         // ИСПРАВЛЕННАЯ функция создания пакета с правильной логикой Router-on-a-Stick
@@ -691,7 +888,7 @@
             const sourcePC = isVlan10to20 ? 'ПК1' : 'ПК2';
             const destPC = isVlan10to20 ? 'ПК2' : 'ПК1';
             
-            // Создание пакета
+            // Создание пакета в виде конверта
             const packet = document.createElement('a-entity');
             packet.setAttribute('id', packetId);
             
@@ -709,13 +906,13 @@
             packet.appendChild(envelopeSymbol);
             
             // Начальная позиция - от ПК
-            const startPos = isVlan10to20 ? '-0.5 0.1 0.6' : '0.5 0.1 0.6';
+            const startPos = isVlan10to20 ? '-0.35 0.1 0.425' : '0.35 0.1 0.425';
             packet.setAttribute('position', startPos);
             
             document.getElementById('packetContainer').appendChild(packet);
             currentPacket = packet;
             
-            // Начинаем анимацию
+            // Начинаем анимацию с первой стадии
             executeAnimationStage(1, 0);
         }
         
@@ -742,7 +939,7 @@
                     
                     updateVlanInfo(packetAnimationState.title, packetAnimationState.details);
                     
-                    const switchAccessPos = isVlan10to20 ? '-0.175 0.1 0.425' : '0.175 0.1 0.425';
+                    const switchAccessPos = isVlan10to20 ? '-0.1 0.1 0.005' : '0.1 0.1 0.005';
                     animatePacketToPosition(switchAccessPos, 1500, () => {
                         executeAnimationStage(2, 0);
                     });
@@ -764,7 +961,7 @@
                         currentPacket.setAttribute('material', `color: #00ff88`);
                         
                         // Двигаем к роутеру по trunk
-                        animatePacketToPosition('0 0.15 0.1', 2000, () => {
+                        animatePacketToPosition('0 0.05 -0.44', 2000, () => {
                             executeAnimationStage(3, 0);
                         });
                     });
@@ -781,7 +978,7 @@
                     updateVlanInfo(packetAnimationState.title, packetAnimationState.details);
                     
                     // Поднимаем пакет к роутеру для обработки
-                    animatePacketToPosition('0 0.25 0', 1000, () => {
+                    animatePacketToPosition('0 0.25 -0.44', 1000, () => {
                         // Анимация обработки в роутере
                         animatePacketProcessingAtRouter(() => {
                             // Меняем VLAN tag на целевой
@@ -802,7 +999,7 @@
                     updateVlanInfo(packetAnimationState.title, packetAnimationState.details);
                     
                     // Опускаем пакет обратно к trunk
-                    animatePacketToPosition('0 0.15 0.1', 1000, () => {
+                    animatePacketToPosition('0 0.05 -0.44', 1000, () => {
                         executeAnimationStage(5, 0);
                     });
                     break;
@@ -818,14 +1015,14 @@
                     updateVlanInfo(packetAnimationState.title, packetAnimationState.details);
                     
                     // Двигаем к коммутатору
-                    animatePacketToPosition('0 0.13 0.275', 1500, () => {
+                    animatePacketToPosition('0 0.05 -0.005', 1500, () => {
                         // Анимация обработки в коммутаторе
                         animatePacketProcessingAtSwitch(() => {
                             // Меняем цвет на цвет целевого VLAN
                             const destColor = isVlan10to20 ? '#ff4444' : '#0099ff';
                             currentPacket.setAttribute('material', `color: ${destColor}`);
                             
-                            const destSwitchPos = isVlan10to20 ? '0.175 0.1 0.425' : '-0.175 0.1 0.425';
+                            const destSwitchPos = isVlan10to20 ? '0.1 0.1 0.005' : '-0.1 0.1 0.005';
                             animatePacketToPosition(destSwitchPos, 1500, () => {
                                 executeAnimationStage(6, 0);
                             });
@@ -841,7 +1038,7 @@
                         details: `Пакет #${packetSequence}<br>Успешно доставлен!<br>VLAN ${destVlan}`
                     };
                     
-                    const destPos = isVlan10to20 ? '0.5 0.1 0.6' : '-0.5 0.1 0.6';
+                    const destPos = isVlan10to20 ? '0.35 0.1 0.425' : '-0.35 0.1 0.425';
                     
                     // Отправляем к получателю
                     animatePacketToPosition(destPos, 1500, () => {
@@ -978,62 +1175,6 @@
             animationTimeouts.push(timeout);
         }
         
-        function startVlanTransmission() {
-            if (isPaused && currentPacket) {
-                isPaused = false;
-                resumePacketAnimation();
-            } else if (!isTransmissionActive && !currentPacket) {
-                isTransmissionActive = true;
-                isPaused = false;
-                createVlanPacket();
-            }
-        }
-        
-        function pauseTransmission() {
-            if (isTransmissionActive && currentPacket && !isPaused) {
-                isPaused = true;
-                animationTimeouts.forEach(timeout => clearTimeout(timeout));
-                animationTimeouts = [];
-                
-                if (currentPacket) {
-                    currentPacket.removeAttribute('animation');
-                    currentPacket.removeAttribute('animation__bob');
-                    currentPacket.removeAttribute('animation__scale');
-                    currentPacket.removeAttribute('animation__fade');
-                }
-                
-                updateVlanInfo('⏸️ Передача приостановлена', 'Нажмите Старт для продолжения');
-            }
-        }
-        
-        function resumePacketAnimation() {
-            if (packetAnimationState && currentPacket) {
-                const state = packetAnimationState;
-                updateVlanInfo(state.title, state.details);
-                executeAnimationStage(state.stage, state.progress);
-            }
-        }
-        
-        function resetTransmission() {
-            stopTransmission();
-            packetSequence = 0;
-            currentDirection = 'vlan10_to_vlan20';
-            packetAnimationState = null;
-            document.getElementById('vlanInfo').style.display = 'none';
-        }
-        
-        function stopTransmission() {
-            isTransmissionActive = false;
-            isPaused = false;
-            animationTimeouts.forEach(timeout => clearTimeout(timeout));
-            animationTimeouts = [];
-            
-            const packetContainer = document.getElementById('packetContainer');
-            packetContainer.innerHTML = '';
-            currentPacket = null;
-            packetAnimationState = null;
-        }
-        
         function updateVlanInfo(title, details) {
             const infoDiv = document.getElementById('vlanInfo');
             infoDiv.innerHTML = `<h4 style="margin: 0 0 8px 0; color: #00ff88; font-size: 14px;">${title}</h4><div style="font-size: 11px; line-height: 1.3;">${details}</div>`;
@@ -1051,48 +1192,21 @@
                   'interface Gi0/0.20\n encapsulation dot1Q 20\n ip address 192.168.20.1 255.255.255.0');
         }
         
-        // Инициализация
+        // Отслеживание загрузки моделей после загрузки сцены
         document.querySelector('a-scene').addEventListener('loaded', function() {
-            // Принудительно применяем материалы
-            applyMaterialsAfterLoad();
-            setupDeviceClickHandlers();
+            const models = document.querySelectorAll('[obj-model]');
             
-            // Помечаем модели как загруженные
-            modelsLoaded = totalModels;
-            document.getElementById('loading').style.display = 'none';
-        });
-        
-        function applyMaterialsAfterLoad() {
-            // Убедимся, что все модели имеют правильные материалы
-            const routerModel = document.getElementById('router-model');
-            const switchModel = document.getElementById('switch-model');
-            const pc1Model = document.getElementById('pc1-model');
-            const pc2Model = document.getElementById('pc2-model');
+            models.forEach((model) => {
+                model.addEventListener('model-loaded', onModelLoaded);
+                model.addEventListener('model-error', (e) => {
+                    console.error('Ошибка загрузки модели:', e.detail);
+                    // Продолжаем даже при ошибках
+                    onModelLoaded();
+                });
+            });
             
-            if (routerModel) routerModel.setAttribute('material', 'color: #ffaa00; metalness: 0.3; roughness: 0.7');
-            if (switchModel) switchModel.setAttribute('material', 'color: #888888; metalness: 0.4; roughness: 0.6');
-            if (pc1Model) pc1Model.setAttribute('material', 'color: #0099ff; metalness: 0.2; roughness: 0.8');
-            if (pc2Model) pc2Model.setAttribute('material', 'color: #ff4444; metalness: 0.2; roughness: 0.8');
-        }
-        
-        // Отслеживание маркера
-        const marker = document.getElementById('networkMarker');
-        const statusDiv = document.getElementById('markerStatus');
-        const controlsDiv = document.getElementById('controls');
-        
-        marker.addEventListener('markerFound', () => {
-            statusDiv.innerHTML = '✅ Топология активирована!';
-            statusDiv.style.color = '#00ff00';
-            statusDiv.style.borderColor = '#00ff00';
-            controlsDiv.style.display = 'flex';
-        });
-        
-        marker.addEventListener('markerLost', () => {
-            statusDiv.innerHTML = '❌ Ожидание маркера...';
-            statusDiv.style.color = '#ff4444';
-            statusDiv.style.borderColor = '#ff4444';
-            controlsDiv.style.display = 'none';
-            stopTransmission();
+            // Создаем резервные модели на случай ошибок загрузки
+            createFallbackModels();
         });
     </script>
 </body>
